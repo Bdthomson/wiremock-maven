@@ -8,26 +8,32 @@
     <artifactId>wiremock</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <properties>
+        <jetty.version>9.2.24.v20180105</jetty.version>
+        <jackson.version>2.8.11</jackson.version>
+        <handlebars.version>4.0.6</handlebars.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-server</artifactId>
-            <version>9.2.24.v20180105</version>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
-            <version>9.2.24.v20180105</version>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlets</artifactId>
-            <version>9.2.24.v20180105</version>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-webapp</artifactId>
-            <version>9.2.24.v20180105</version>
+            <version>${jetty.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -37,17 +43,17 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.8.11</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.8.11</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.8.11</version>
+            <version>${jackson.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
@@ -103,7 +109,7 @@
         <dependency>
             <groupId>com.github.jknack</groupId>
             <artifactId>handlebars</artifactId>
-            <version>4.0.6</version>
+            <version>${handlebars.version}</version>
             <exclusions>
                 <exclusion>
                     <artifactId>rhino</artifactId>
@@ -114,7 +120,7 @@
         <dependency>
             <groupId>com.github.jknack</groupId>
             <artifactId>handlebars-helpers</artifactId>
-            <version>4.0.6</version>
+            <version>${handlebars.version}</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -216,14 +222,9 @@
             <version>1.7.12</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.github.tomakehurst</groupId>
-            <artifactId>wiremock-standalone</artifactId>
-            <version>2.18.0</version>
-        </dependency>
     </dependencies>
 
-
+    <!-- TODO: Update to java 8 -->
     <build>
         <plugins>
             <plugin>
@@ -236,6 +237,5 @@
             </plugin>
         </plugins>
     </build>
-
 
 </project>
