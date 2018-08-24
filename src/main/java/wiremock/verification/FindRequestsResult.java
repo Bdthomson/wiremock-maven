@@ -22,24 +22,25 @@ import java.util.List;
 
 public class FindRequestsResult extends JournalBasedResult {
 
-    private final List<LoggedRequest> requests;
+  private final List<LoggedRequest> requests;
 
-    @JsonCreator
-    public FindRequestsResult(@JsonProperty("requests") List<LoggedRequest> requests,
-                              @JsonProperty("requestJournalDisabled") boolean requestJournalDisabled) {
-        super(requestJournalDisabled);
-        this.requests = requests;
-    }
+  @JsonCreator
+  public FindRequestsResult(
+      @JsonProperty("requests") List<LoggedRequest> requests,
+      @JsonProperty("requestJournalDisabled") boolean requestJournalDisabled) {
+    super(requestJournalDisabled);
+    this.requests = requests;
+  }
 
-    public List<LoggedRequest> getRequests() {
-        return requests;
-    }
+  public List<LoggedRequest> getRequests() {
+    return requests;
+  }
 
-    public static FindRequestsResult withRequestJournalDisabled() {
-        return new FindRequestsResult(Collections.<LoggedRequest>emptyList(), true);
-    }
+  public static FindRequestsResult withRequestJournalDisabled() {
+    return new FindRequestsResult(Collections.<LoggedRequest>emptyList(), true);
+  }
 
-    public static FindRequestsResult withRequests(List<LoggedRequest> requests) {
-        return new FindRequestsResult(requests, false);
-    }
+  public static FindRequestsResult withRequests(List<LoggedRequest> requests) {
+    return new FindRequestsResult(requests, false);
+  }
 }

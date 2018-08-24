@@ -15,8 +15,8 @@
  */
 package wiremock.admin.tasks;
 
-import static wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 
 import wiremock.admin.AdminTask;
 import wiremock.admin.model.PathParams;
@@ -28,13 +28,13 @@ import wiremock.verification.FindRequestsResult;
 
 public class FindUnmatchedRequestsTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        FindRequestsResult unmatchedRequests = admin.findUnmatchedRequests();
-        return responseDefinition()
-            .withStatus(HTTP_OK)
-            .withBody(Json.write(unmatchedRequests))
-            .withHeader("Content-Type", "application/json")
-            .build();
-    }
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    FindRequestsResult unmatchedRequests = admin.findUnmatchedRequests();
+    return responseDefinition()
+        .withStatus(HTTP_OK)
+        .withBody(Json.write(unmatchedRequests))
+        .withHeader("Content-Type", "application/json")
+        .build();
+  }
 }

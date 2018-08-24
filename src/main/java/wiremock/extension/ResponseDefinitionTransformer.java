@@ -19,9 +19,13 @@ import wiremock.common.FileSource;
 import wiremock.http.Request;
 import wiremock.http.ResponseDefinition;
 
-public abstract class ResponseDefinitionTransformer extends AbstractTransformer<ResponseDefinition> {
+public abstract class ResponseDefinitionTransformer
+    extends AbstractTransformer<ResponseDefinition> {
 
-    @Override
-    public abstract ResponseDefinition transform(Request request, ResponseDefinition responseDefinition, FileSource files, Parameters parameters);
-
+  @Override
+  public abstract ResponseDefinition transform(
+      Request request,
+      ResponseDefinition responseDefinition,
+      FileSource files,
+      Parameters parameters);
 }

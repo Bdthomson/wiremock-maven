@@ -17,5 +17,5 @@ package wiremock.extension;
 
 public interface Extension {
 
-    String getName();
+  String getName();
 }

@@ -17,23 +17,23 @@ package wiremock.admin.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import wiremock.admin.LimitAndOffsetPaginator;
 import wiremock.stubbing.StubMapping;
-import java.util.List;
 
 public class ListStubMappingsResult extends PaginatedResult<StubMapping> {
 
-    @JsonCreator
-    public ListStubMappingsResult(@JsonProperty("mappings") List<StubMapping> mappings,
-                                  @JsonProperty("meta") Meta meta) {
-        super(mappings, meta);
-    }
+  @JsonCreator
+  public ListStubMappingsResult(
+      @JsonProperty("mappings") List<StubMapping> mappings, @JsonProperty("meta") Meta meta) {
+    super(mappings, meta);
+  }
 
-    public ListStubMappingsResult(LimitAndOffsetPaginator<StubMapping> paginator) {
-        super(paginator);
-    }
+  public ListStubMappingsResult(LimitAndOffsetPaginator<StubMapping> paginator) {
+    super(paginator);
+  }
 
-    public List<StubMapping> getMappings() {
-        return select();
-    }
+  public List<StubMapping> getMappings() {
+    return select();
+  }
 }

@@ -78,34 +78,46 @@ public class WireMockServer implements Container, Stubbing, Admin {
 
     this.stubRequestHandler = wireMockApp.buildStubRequestHandler();
     HttpServerFactory httpServerFactory = options.httpServerFactory();
-    httpServer = httpServerFactory.buildHttpServer(options, wireMockApp.buildAdminRequestHandler(),
-        stubRequestHandler);
+    httpServer =
+        httpServerFactory.buildHttpServer(
+            options, wireMockApp.buildAdminRequestHandler(), stubRequestHandler);
 
     client = new WireMock(wireMockApp);
   }
 
-  public WireMockServer(int port, Integer httpsPort, FileSource fileSource,
-      boolean enableBrowserProxying, ProxySettings proxySettings, Notifier notifier) {
-    this(wireMockConfig().port(port)
-        .httpsPort(httpsPort)
-        .fileSource(fileSource)
-        .enableBrowserProxying(enableBrowserProxying)
-        .proxyVia(proxySettings)
-        .notifier(notifier));
+  public WireMockServer(
+      int port,
+      Integer httpsPort,
+      FileSource fileSource,
+      boolean enableBrowserProxying,
+      ProxySettings proxySettings,
+      Notifier notifier) {
+    this(
+        wireMockConfig()
+            .port(port)
+            .httpsPort(httpsPort)
+            .fileSource(fileSource)
+            .enableBrowserProxying(enableBrowserProxying)
+            .proxyVia(proxySettings)
+            .notifier(notifier));
   }
 
-  public WireMockServer(int port, FileSource fileSource, boolean enableBrowserProxying,
-      ProxySettings proxySettings) {
-    this(wireMockConfig().port(port)
-        .fileSource(fileSource)
-        .enableBrowserProxying(enableBrowserProxying)
-        .proxyVia(proxySettings));
+  public WireMockServer(
+      int port, FileSource fileSource, boolean enableBrowserProxying, ProxySettings proxySettings) {
+    this(
+        wireMockConfig()
+            .port(port)
+            .fileSource(fileSource)
+            .enableBrowserProxying(enableBrowserProxying)
+            .proxyVia(proxySettings));
   }
 
   public WireMockServer(int port, FileSource fileSource, boolean enableBrowserProxying) {
-    this(wireMockConfig().port(port)
-        .fileSource(fileSource)
-        .enableBrowserProxying(enableBrowserProxying));
+    this(
+        wireMockConfig()
+            .port(port)
+            .fileSource(fileSource)
+            .enableBrowserProxying(enableBrowserProxying));
   }
 
   public WireMockServer(int port) {
@@ -113,8 +125,7 @@ public class WireMockServer implements Container, Stubbing, Admin {
   }
 
   public WireMockServer(int port, Integer httpsPort) {
-    this(wireMockConfig().port(port)
-        .httpsPort(httpsPort));
+    this(wireMockConfig().port(port).httpsPort(httpsPort));
   }
 
   public WireMockServer() {
@@ -135,8 +146,8 @@ public class WireMockServer implements Container, Stubbing, Admin {
 
   public void enableRecordMappings(FileSource mappingsFileSource, FileSource filesFileSource) {
     addMockServiceRequestListener(
-        new StubMappingJsonRecorder(mappingsFileSource, filesFileSource, wireMockApp,
-            options.matchingHeaders()));
+        new StubMappingJsonRecorder(
+            mappingsFileSource, filesFileSource, wireMockApp, options.matchingHeaders()));
     notifier.info("Recording mappings to " + mappingsFileSource.getPath());
   }
 
@@ -155,45 +166,48 @@ public class WireMockServer implements Container, Stubbing, Admin {
   /**
    * Gracefully shutdown the server.
    *
-   * This method assumes it is being called as the result of an incoming HTTP request.
+   * <p>This method assumes it is being called as the result of an incoming HTTP request.
    */
   @Override
   public void shutdown() {
     final WireMockServer server = this;
-    Thread shutdownThread = new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          // We have to sleep briefly to finish serving the shutdown request before stopping the server, as
-          // there's no support in Jetty for shutting down after the current request.
-          // See http://stackoverflow.com/questions/4650713
-          Thread.sleep(100);
-        } catch (InterruptedException e) {
-          throw new RuntimeException(e);
-        }
-        server.stop();
-      }
-    });
+    Thread shutdownThread =
+        new Thread(
+            new Runnable() {
+              @Override
+              public void run() {
+                try {
+                  // We have to sleep briefly to finish serving the shutdown request before stopping
+                  // the server, as
+                  // there's no support in Jetty for shutting down after the current request.
+                  // See http://stackoverflow.com/questions/4650713
+                  Thread.sleep(100);
+                } catch (InterruptedException e) {
+                  throw new RuntimeException(e);
+                }
+                server.stop();
+              }
+            });
     shutdownThread.start();
   }
 
   public int port() {
-//    com.google.common.base.Preconditions
-//    com.google.common.base.Preconditions.checkState(isRunning(),
-//        "Not listening on HTTP port. The WireMock server is most likely stopped");
+    //    com.google.common.base.Preconditions
+    //    com.google.common.base.Preconditions.checkState(isRunning(),
+    //        "Not listening on HTTP port. The WireMock server is most likely stopped");
     return httpServer.port();
   }
 
   public int httpsPort() {
-//    com.google.common.base.Preconditions.checkState(isRunning() && options.httpsSettings()
-//            .enabled(),
-//        "Not listening on HTTPS port. Either HTTPS is not enabled or the WireMock server is stopped.");
+    //    com.google.common.base.Preconditions.checkState(isRunning() && options.httpsSettings()
+    //            .enabled(),
+    //        "Not listening on HTTPS port. Either HTTPS is not enabled or the WireMock server is
+    // stopped.");
     return httpServer.httpsPort();
   }
 
   public String url(String path) {
-    boolean https = options.httpsSettings()
-        .enabled();
+    boolean https = options.httpsSettings().enabled();
     String protocol = https ? "https" : "http";
     int port = https ? httpsPort() : port();
 
@@ -235,14 +249,12 @@ public class WireMockServer implements Container, Stubbing, Admin {
 
   @Override
   public List<StubMapping> getStubMappings() {
-    return client.allStubMappings()
-        .getMappings();
+    return client.allStubMappings().getMappings();
   }
 
   @Override
   public StubMapping getSingleStubMapping(UUID id) {
-    return client.getStubMapping(id)
-        .getItem();
+    return client.getStubMapping(id).getItem();
   }
 
   @Override

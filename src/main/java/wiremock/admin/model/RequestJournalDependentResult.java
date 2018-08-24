@@ -15,24 +15,25 @@
  */
 package wiremock.admin.model;
 
-import wiremock.admin.Paginator;
 import java.util.List;
+import wiremock.admin.Paginator;
 
 public abstract class RequestJournalDependentResult<T> extends PaginatedResult<T> {
 
-    private final boolean requestJournalDisabled;
+  private final boolean requestJournalDisabled;
 
-    protected RequestJournalDependentResult(Paginator<T> paginator, boolean requestJournalDisabled) {
-        super(paginator);
-        this.requestJournalDisabled = requestJournalDisabled;
-    }
+  protected RequestJournalDependentResult(Paginator<T> paginator, boolean requestJournalDisabled) {
+    super(paginator);
+    this.requestJournalDisabled = requestJournalDisabled;
+  }
 
-    protected RequestJournalDependentResult(List<T> source, Meta meta, boolean requestJournalDisabled) {
-        super(source, meta);
-        this.requestJournalDisabled = requestJournalDisabled;
-    }
+  protected RequestJournalDependentResult(
+      List<T> source, Meta meta, boolean requestJournalDisabled) {
+    super(source, meta);
+    this.requestJournalDisabled = requestJournalDisabled;
+  }
 
-    public boolean isRequestJournalDisabled() {
-        return requestJournalDisabled;
-    }
+  public boolean isRequestJournalDisabled() {
+    return requestJournalDisabled;
+  }
 }

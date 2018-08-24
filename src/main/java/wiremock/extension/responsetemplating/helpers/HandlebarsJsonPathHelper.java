@@ -23,26 +23,24 @@ import java.io.IOException;
 
 public class HandlebarsJsonPathHelper extends HandlebarsHelper<String> {
 
-    @Override
-    public Object apply(final String inputJson, final Options options) throws IOException {
-        if (inputJson == null) {
-            return "";
-        }
-
-        if (options == null || options.param(0, null) == null) {
-            return this.handleError("The JSONPath cannot be empty");
-        }
-
-        final String jsonPath = options.param(0);
-        try {
-            Object result = JsonPath.read(inputJson, jsonPath);
-            return JsonData.create(result);
-        } catch (InvalidJsonException e) {
-            return this.handleError(
-                    inputJson + " is not valid JSON",
-                    e.getJson(), e);
-        } catch (JsonPathException e) {
-            return this.handleError(jsonPath + " is not a valid JSONPath expression", e);
-        }
+  @Override
+  public Object apply(final String inputJson, final Options options) throws IOException {
+    if (inputJson == null) {
+      return "";
     }
+
+    if (options == null || options.param(0, null) == null) {
+      return this.handleError("The JSONPath cannot be empty");
+    }
+
+    final String jsonPath = options.param(0);
+    try {
+      Object result = JsonPath.read(inputJson, jsonPath);
+      return JsonData.create(result);
+    } catch (InvalidJsonException e) {
+      return this.handleError(inputJson + " is not valid JSON", e.getJson(), e);
+    } catch (JsonPathException e) {
+      return this.handleError(jsonPath + " is not a valid JSONPath expression", e);
+    }
+  }
 }

@@ -39,7 +39,6 @@ import wiremock.matching.RequestMatcherExtension;
 import wiremock.matching.StringValuePattern;
 import wiremock.verification.LoggedRequest;
 
-
 public class InMemoryStubMappings implements StubMappings {
 
   private final SortedConcurrentMappingSet mappings = new SortedConcurrentMappingSet();
@@ -48,35 +47,44 @@ public class InMemoryStubMappings implements StubMappings {
   private final Map<String, ResponseDefinitionTransformer> transformers;
   private final FileSource rootFileSource;
 
-  public InMemoryStubMappings(Map<String, RequestMatcherExtension> customMatchers,
-      Map<String, ResponseDefinitionTransformer> transformers, FileSource rootFileSource) {
+  public InMemoryStubMappings(
+      Map<String, RequestMatcherExtension> customMatchers,
+      Map<String, ResponseDefinitionTransformer> transformers,
+      FileSource rootFileSource) {
     this.customMatchers = customMatchers;
     this.transformers = transformers;
     this.rootFileSource = rootFileSource;
   }
 
   public InMemoryStubMappings() {
-    this(Collections.<String, RequestMatcherExtension>emptyMap(),
+    this(
+        Collections.<String, RequestMatcherExtension>emptyMap(),
         Collections.<String, ResponseDefinitionTransformer>emptyMap(),
         new SingleRootFileSource("."));
   }
 
   @Override
   public ServeEvent serveFor(Request request) {
-    StubMapping matchingMapping = find(mappings, mappingMatchingAndInCorrectScenarioState(request),
-        StubMapping.NOT_CONFIGURED);
+    StubMapping matchingMapping =
+        find(
+            mappings,
+            mappingMatchingAndInCorrectScenarioState(request),
+            StubMapping.NOT_CONFIGURED);
 
     scenarios.onStubServed(matchingMapping);
 
-    ResponseDefinition responseDefinition = applyTransformations(request,
-        matchingMapping.getResponse(), ImmutableList.copyOf(transformers.values()));
+    ResponseDefinition responseDefinition =
+        applyTransformations(
+            request, matchingMapping.getResponse(), ImmutableList.copyOf(transformers.values()));
 
-    return ServeEvent.of(LoggedRequest.createFrom(request), copyOf(responseDefinition),
-        matchingMapping);
+    return ServeEvent.of(
+        LoggedRequest.createFrom(request), copyOf(responseDefinition), matchingMapping);
   }
 
-  private ResponseDefinition applyTransformations(Request request,
-      ResponseDefinition responseDefinition, List<ResponseDefinitionTransformer> transformers) {
+  private ResponseDefinition applyTransformations(
+      Request request,
+      ResponseDefinition responseDefinition,
+      List<ResponseDefinitionTransformer> transformers) {
     if (transformers.isEmpty()) {
       return responseDefinition;
     }
@@ -84,12 +92,15 @@ public class InMemoryStubMappings implements StubMappings {
     ResponseDefinitionTransformer transformer = transformers.get(0);
     ResponseDefinition newResponseDef =
         transformer.applyGlobally() || responseDefinition.hasTransformer(transformer)
-            ? transformer.transform(request, responseDefinition,
-            rootFileSource.child(WireMockApp.FILES_ROOT),
-            responseDefinition.getTransformerParameters()) : responseDefinition;
+            ? transformer.transform(
+                request,
+                responseDefinition,
+                rootFileSource.child(WireMockApp.FILES_ROOT),
+                responseDefinition.getTransformerParameters())
+            : responseDefinition;
 
-    return applyTransformations(request, newResponseDef,
-        transformers.subList(1, transformers.size()));
+    return applyTransformations(
+        request, newResponseDef, transformers.subList(1, transformers.size()));
   }
 
   @Override
@@ -106,8 +117,8 @@ public class InMemoryStubMappings implements StubMappings {
 
   @Override
   public void editMapping(StubMapping stubMapping) {
-    final Optional<StubMapping> optionalExistingMapping = tryFind(mappings,
-        mappingMatchingUuid(stubMapping.getUuid()));
+    final Optional<StubMapping> optionalExistingMapping =
+        tryFind(mappings, mappingMatchingUuid(stubMapping.getUuid()));
 
     if (!optionalExistingMapping.isPresent()) {
       String msg = "StubMapping with UUID: " + stubMapping.getUuid() + " not found";
@@ -123,7 +134,6 @@ public class InMemoryStubMappings implements StubMappings {
     mappings.replace(existingMapping, stubMapping);
     scenarios.onStubMappingAddedOrUpdated(stubMapping, mappings);
   }
-
 
   @Override
   public void reset() {
@@ -143,13 +153,14 @@ public class InMemoryStubMappings implements StubMappings {
 
   @Override
   public Optional<StubMapping> get(final UUID id) {
-    return tryFind(mappings, new Predicate<StubMapping>() {
-      @Override
-      public boolean apply(StubMapping input) {
-        return input.getUuid()
-            .equals(id);
-      }
-    });
+    return tryFind(
+        mappings,
+        new Predicate<StubMapping>() {
+          @Override
+          public boolean apply(StubMapping input) {
+            return input.getUuid().equals(id);
+          }
+        });
   }
 
   @Override
@@ -159,14 +170,15 @@ public class InMemoryStubMappings implements StubMappings {
 
   @Override
   public List<StubMapping> findByMetadata(final StringValuePattern pattern) {
-    return from(mappings).filter(new Predicate<StubMapping>() {
-      @Override
-      public boolean apply(StubMapping stub) {
-        String metadataJson = Json.write(stub.getMetadata());
-        return pattern.match(metadataJson)
-            .isExactMatch();
-      }
-    })
+    return from(mappings)
+        .filter(
+            new Predicate<StubMapping>() {
+              @Override
+              public boolean apply(StubMapping stub) {
+                String metadataJson = Json.write(stub.getMetadata());
+                return pattern.match(metadataJson).isExactMatch();
+              }
+            })
         .toList();
   }
 
@@ -178,10 +190,9 @@ public class InMemoryStubMappings implements StubMappings {
       final Request request) {
     return new Predicate<StubMapping>() {
       public boolean apply(StubMapping mapping) {
-        return mapping.getRequest()
-            .match(request, customMatchers)
-            .isExactMatch() && (mapping.isIndependentOfScenarioState()
-            || scenarios.mappingMatchesScenarioState(mapping));
+        return mapping.getRequest().match(request, customMatchers).isExactMatch()
+            && (mapping.isIndependentOfScenarioState()
+                || scenarios.mappingMatchesScenarioState(mapping));
       }
     };
   }
@@ -190,8 +201,7 @@ public class InMemoryStubMappings implements StubMappings {
     return new Predicate<StubMapping>() {
       @Override
       public boolean apply(StubMapping input) {
-        return input.getUuid()
-            .equals(uuid);
+        return input.getUuid().equals(uuid);
       }
     };
   }

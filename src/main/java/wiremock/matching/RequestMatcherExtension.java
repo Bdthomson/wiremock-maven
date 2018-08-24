@@ -24,29 +24,31 @@ import wiremock.http.Request;
 
 public abstract class RequestMatcherExtension extends RequestMatcher implements Extension {
 
-    @Override
-    public MatchResult match(Request request) {
-        return match(request, Parameters.empty());
-    }
+  @Override
+  public MatchResult match(Request request) {
+    return match(request, Parameters.empty());
+  }
 
-    public abstract MatchResult match(Request request, Parameters parameters);
+  public abstract MatchResult match(Request request, Parameters parameters);
 
-    @Override
-    public String getName() {
-        return "inline";
-    }
+  @Override
+  public String getName() {
+    return "inline";
+  }
 
-    public static final RequestMatcherExtension ALWAYS = new RequestMatcherExtension() {
+  public static final RequestMatcherExtension ALWAYS =
+      new RequestMatcherExtension() {
         @Override
         public MatchResult match(Request request, Parameters parameters) {
-            return exactMatch();
+          return exactMatch();
         }
-    };
+      };
 
-    public static final RequestMatcherExtension NEVER = new RequestMatcherExtension() {
+  public static final RequestMatcherExtension NEVER =
+      new RequestMatcherExtension() {
         @Override
         public MatchResult match(Request request, Parameters parameters) {
-            return noMatch();
+          return noMatch();
         }
-    };
+      };
 }

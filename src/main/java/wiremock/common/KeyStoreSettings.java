@@ -26,49 +26,49 @@ import java.security.KeyStore;
 
 public class KeyStoreSettings {
 
-    public static final KeyStoreSettings NO_STORE = new KeyStoreSettings(null, null);
+  public static final KeyStoreSettings NO_STORE = new KeyStoreSettings(null, null);
 
-    private final String path;
-    private final String password;
+  private final String path;
+  private final String password;
 
-    public KeyStoreSettings(String path, String password) {
-        this.path = path;
-        this.password = password;
-    }
+  public KeyStoreSettings(String path, String password) {
+    this.path = path;
+    this.password = password;
+  }
 
-    public String path() {
-        return path;
-    }
+  public String path() {
+    return path;
+  }
 
-    public String password() {
-        return password;
-    }
+  public String password() {
+    return password;
+  }
 
-    public KeyStore loadStore() {
-        InputStream instream = null;
+  public KeyStore loadStore() {
+    InputStream instream = null;
+    try {
+      KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+      instream = createInputStream();
+      trustStore.load(instream, password.toCharArray());
+      return trustStore;
+    } catch (Exception e) {
+      return throwUnchecked(e, KeyStore.class);
+    } finally {
+      if (instream != null) {
         try {
-            KeyStore trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());
-            instream = createInputStream();
-            trustStore.load(instream, password.toCharArray());
-            return trustStore;
-        } catch (Exception e) {
-            return throwUnchecked(e, KeyStore.class);
-        } finally {
-            if (instream != null) {
-                try {
-                    instream.close();
-                } catch (IOException ioe) {
-                    throwUnchecked(ioe);
-                }
-            }
+          instream.close();
+        } catch (IOException ioe) {
+          throwUnchecked(ioe);
         }
+      }
     }
+  }
 
-    private InputStream createInputStream() throws IOException {
-        if (new File(path).isFile()) {
-            return new FileInputStream(path);
-        } else {
-            return Resources.getResource(path).openStream();
-        }
+  private InputStream createInputStream() throws IOException {
+    if (new File(path).isFile()) {
+      return new FileInputStream(path);
+    } else {
+      return Resources.getResource(path).openStream();
     }
+  }
 }

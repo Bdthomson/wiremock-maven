@@ -22,24 +22,26 @@ import java.io.IOException;
 
 public abstract class PathPatternJsonSerializer<T extends PathPattern> extends JsonSerializer<T> {
 
-    @Override
-    public void serialize(T value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        gen.writeStartObject();
+  @Override
+  public void serialize(T value, JsonGenerator gen, SerializerProvider serializers)
+      throws IOException {
+    gen.writeStartObject();
 
-        if (value.isSimple()) {
-            gen.writeStringField(value.getName(), value.getExpected());
-        } else {
-            gen.writeObjectFieldStart(value.getName());
-            gen.writeStringField("expression", value.getExpected());
-            gen.writeStringField(value.getValuePattern().getName(), value.getValuePattern().getExpected());
-            gen.writeEndObject();
-        }
-
-        serializeAdditionalFields(value, gen, serializers);
-
-        gen.writeEndObject();
+    if (value.isSimple()) {
+      gen.writeStringField(value.getName(), value.getExpected());
+    } else {
+      gen.writeObjectFieldStart(value.getName());
+      gen.writeStringField("expression", value.getExpected());
+      gen.writeStringField(
+          value.getValuePattern().getName(), value.getValuePattern().getExpected());
+      gen.writeEndObject();
     }
 
-    protected abstract void serializeAdditionalFields(T value, JsonGenerator gen, SerializerProvider serializers) throws IOException;
+    serializeAdditionalFields(value, gen, serializers);
 
+    gen.writeEndObject();
+  }
+
+  protected abstract void serializeAdditionalFields(
+      T value, JsonGenerator gen, SerializerProvider serializers) throws IOException;
 }

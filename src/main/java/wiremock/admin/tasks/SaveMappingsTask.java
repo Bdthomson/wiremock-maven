@@ -22,9 +22,9 @@ import wiremock.http.Request;
 import wiremock.http.ResponseDefinition;
 
 public class SaveMappingsTask implements AdminTask {
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        admin.saveMappings();
-        return ResponseDefinition.ok();
-    }
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    admin.saveMappings();
+    return ResponseDefinition.ok();
+  }
 }

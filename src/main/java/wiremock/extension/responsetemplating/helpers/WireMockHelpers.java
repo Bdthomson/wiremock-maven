@@ -21,65 +21,65 @@ import java.io.IOException;
 import java.util.Date;
 
 /**
- * This enum is implemented similar to the StringHelpers of handlebars.
- * It is basically a library of all available wiremock helpers
+ * This enum is implemented similar to the StringHelpers of handlebars. It is basically a library of
+ * all available wiremock helpers
  */
 public enum WireMockHelpers implements Helper<Object> {
-    xPath {
-        private HandlebarsXPathHelper helper = new HandlebarsXPathHelper();
+  xPath {
+    private HandlebarsXPathHelper helper = new HandlebarsXPathHelper();
 
-        @Override
-        public Object apply(final Object context, final Options options) throws IOException {
-            return this.helper.apply(String.valueOf(context), options);
-        }
-    },
-    soapXPath {
-        private HandlebarsSoapHelper helper = new HandlebarsSoapHelper();
-
-        @Override
-        public Object apply(final Object context, final Options options) throws IOException {
-            return this.helper.apply(String.valueOf(context), options);
-        }
-    },
-    jsonPath {
-        private HandlebarsJsonPathHelper helper = new HandlebarsJsonPathHelper();
-
-        @Override
-        public Object apply(final Object context, final Options options) throws IOException {
-            return this.helper.apply(String.valueOf(context), options);
-        }
-    },
-    randomValue {
-        private HandlebarsRandomValuesHelper helper = new HandlebarsRandomValuesHelper();
-
-        @Override
-        public Object apply(final Object context, final Options options) throws IOException {
-            return this.helper.apply(null, options);
-        }
-    },
-    date {
-        private HandlebarsCurrentDateHelper helper = new HandlebarsCurrentDateHelper();
-
-        @Override
-        public Object apply(final Object context, final Options options) throws IOException {
-            Date dateContext = context instanceof Date ? (Date) context : null;
-            return this.helper.apply(dateContext, options);
-        }
-    },
-    now {
-        private HandlebarsCurrentDateHelper helper = new HandlebarsCurrentDateHelper();
-
-        @Override
-        public Object apply(final Object context, final Options options) throws IOException {
-            return this.helper.apply(null, options);
-        }
-    },
-    parseDate {
-        private ParseDateHelper helper = new ParseDateHelper();
-
-        @Override
-        public Object apply(Object context, Options options) throws IOException {
-            return helper.apply(context.toString(), options);
-        }
+    @Override
+    public Object apply(final Object context, final Options options) throws IOException {
+      return this.helper.apply(String.valueOf(context), options);
     }
+  },
+  soapXPath {
+    private HandlebarsSoapHelper helper = new HandlebarsSoapHelper();
+
+    @Override
+    public Object apply(final Object context, final Options options) throws IOException {
+      return this.helper.apply(String.valueOf(context), options);
+    }
+  },
+  jsonPath {
+    private HandlebarsJsonPathHelper helper = new HandlebarsJsonPathHelper();
+
+    @Override
+    public Object apply(final Object context, final Options options) throws IOException {
+      return this.helper.apply(String.valueOf(context), options);
+    }
+  },
+  randomValue {
+    private HandlebarsRandomValuesHelper helper = new HandlebarsRandomValuesHelper();
+
+    @Override
+    public Object apply(final Object context, final Options options) throws IOException {
+      return this.helper.apply(null, options);
+    }
+  },
+  date {
+    private HandlebarsCurrentDateHelper helper = new HandlebarsCurrentDateHelper();
+
+    @Override
+    public Object apply(final Object context, final Options options) throws IOException {
+      Date dateContext = context instanceof Date ? (Date) context : null;
+      return this.helper.apply(dateContext, options);
+    }
+  },
+  now {
+    private HandlebarsCurrentDateHelper helper = new HandlebarsCurrentDateHelper();
+
+    @Override
+    public Object apply(final Object context, final Options options) throws IOException {
+      return this.helper.apply(null, options);
+    }
+  },
+  parseDate {
+    private ParseDateHelper helper = new ParseDateHelper();
+
+    @Override
+    public Object apply(Object context, Options options) throws IOException {
+      return helper.apply(context.toString(), options);
+    }
+  }
 }

@@ -15,78 +15,85 @@
  */
 package wiremock.http;
 
-import static wiremock.common.LocalNotifier.notifier;
 import static com.google.common.collect.Lists.newArrayList;
+import static wiremock.common.LocalNotifier.notifier;
 
-import wiremock.stubbing.ServeEvent;
 import java.util.List;
+import wiremock.stubbing.ServeEvent;
 
 public abstract class AbstractRequestHandler implements RequestHandler, RequestEventSource {
 
-	protected List<RequestListener> listeners = newArrayList();
-	protected final ResponseRenderer responseRenderer;
+  protected List<RequestListener> listeners = newArrayList();
+  protected final ResponseRenderer responseRenderer;
 
-	public AbstractRequestHandler(ResponseRenderer responseRenderer) {
-		this.responseRenderer = responseRenderer;
-	}
+  public AbstractRequestHandler(ResponseRenderer responseRenderer) {
+    this.responseRenderer = responseRenderer;
+  }
 
-	@Override
-	public void addRequestListener(RequestListener requestListener) {
-		listeners.add(requestListener);
-	}
+  @Override
+  public void addRequestListener(RequestListener requestListener) {
+    listeners.add(requestListener);
+  }
 
-	protected void beforeResponseSent(ServeEvent serveEvent, Response response) {}
-    protected void afterResponseSent(ServeEvent serveEvent, Response response) {}
+  protected void beforeResponseSent(ServeEvent serveEvent, Response response) {}
 
-	@Override
-	public void handle(Request request, HttpResponder httpResponder) {
-		ServeEvent serveEvent = handleRequest(request);
-		ResponseDefinition responseDefinition = serveEvent.getResponseDefinition();
-		responseDefinition.setOriginalRequest(request);
-		Response response = responseRenderer.render(responseDefinition);
-		ServeEvent completedServeEvent = serveEvent.complete(response);
+  protected void afterResponseSent(ServeEvent serveEvent, Response response) {}
 
-		if (logRequests()) {
-			notifier().info("Request received:\n" +
-					formatRequest(request) +
-					"\n\nMatched response definition:\n" + responseDefinition +
-					"\n\nResponse:\n" + response);
-		}
+  @Override
+  public void handle(Request request, HttpResponder httpResponder) {
+    ServeEvent serveEvent = handleRequest(request);
+    ResponseDefinition responseDefinition = serveEvent.getResponseDefinition();
+    responseDefinition.setOriginalRequest(request);
+    Response response = responseRenderer.render(responseDefinition);
+    ServeEvent completedServeEvent = serveEvent.complete(response);
 
-		for (RequestListener listener: listeners) {
-			listener.requestReceived(request, response);
-		}
+    if (logRequests()) {
+      notifier()
+          .info(
+              "Request received:\n"
+                  + formatRequest(request)
+                  + "\n\nMatched response definition:\n"
+                  + responseDefinition
+                  + "\n\nResponse:\n"
+                  + response);
+    }
 
-        beforeResponseSent(completedServeEvent, response);
+    for (RequestListener listener : listeners) {
+      listener.requestReceived(request, response);
+    }
 
-		httpResponder.respond(request, response);
+    beforeResponseSent(completedServeEvent, response);
 
-        afterResponseSent(completedServeEvent, response);
-	}
+    httpResponder.respond(request, response);
 
-	private static String formatRequest(Request request) {
-		StringBuilder sb = new StringBuilder();
-		sb.append(request.getClientIp())
-				.append(" - ")
-				.append(request.getMethod())
-				.append(" ")
-				.append(request.getUrl());
+    afterResponseSent(completedServeEvent, response);
+  }
 
-		if (request.isBrowserProxyRequest()) {
-			sb.append(" (via browser proxy request)");
-		}
+  private static String formatRequest(Request request) {
+    StringBuilder sb = new StringBuilder();
+    sb.append(request.getClientIp())
+        .append(" - ")
+        .append(request.getMethod())
+        .append(" ")
+        .append(request.getUrl());
 
-		sb.append("\n\n");
-		sb.append(request.getHeaders());
+    if (request.isBrowserProxyRequest()) {
+      sb.append(" (via browser proxy request)");
+    }
 
-		if (request.getBody() != null) {
-			sb.append(request.getBodyAsString()).append("\n");
-		}
+    sb.append("\n\n");
+    sb.append(request.getHeaders());
 
-		return sb.toString();
-	}
+    if (request.getBody() != null) {
+      sb.append(request.getBodyAsString()).append("\n");
+    }
 
-	protected boolean logRequests() { return false; }
+    return sb.toString();
+  }
 
-	protected abstract ServeEvent handleRequest(Request request);
+  protected boolean logRequests() {
+    return false;
+  }
+
+  protected abstract ServeEvent handleRequest(Request request);
 }

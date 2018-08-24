@@ -24,28 +24,26 @@ import wiremock.matching.MultiValuePattern;
 
 public class BasicCredentials {
 
-    public final String username;
-    public final String password;
+  public final String username;
+  public final String password;
 
-    @JsonCreator
-    public BasicCredentials(@JsonProperty("username") String username,
-                            @JsonProperty("password") String password) {
-        this.username = username;
-        this.password = password;
-    }
+  @JsonCreator
+  public BasicCredentials(
+      @JsonProperty("username") String username, @JsonProperty("password") String password) {
+    this.username = username;
+    this.password = password;
+  }
 
-    public boolean present() {
-        return username != null && password != null;
-    }
+  public boolean present() {
+    return username != null && password != null;
+  }
 
-    public MultiValuePattern asAuthorizationMultiValuePattern() {
-        return MultiValuePattern.of(
-            equalToIgnoreCase(asAuthorizationHeaderValue())
-        );
-    }
+  public MultiValuePattern asAuthorizationMultiValuePattern() {
+    return MultiValuePattern.of(equalToIgnoreCase(asAuthorizationHeaderValue()));
+  }
 
-    public String asAuthorizationHeaderValue() {
-        byte[] usernameAndPassword = (username + ":" + password).getBytes();
-        return "Basic " + encodeBase64(usernameAndPassword);
-    }
+  public String asAuthorizationHeaderValue() {
+    byte[] usernameAndPassword = (username + ":" + password).getBytes();
+    return "Basic " + encodeBase64(usernameAndPassword);
+  }
 }

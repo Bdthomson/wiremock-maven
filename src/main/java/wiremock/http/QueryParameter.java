@@ -23,40 +23,41 @@ import java.util.List;
 
 public class QueryParameter extends MultiValue {
 
-    @JsonCreator
-    public QueryParameter(@JsonProperty("key") String key, @JsonProperty("values") List<String> values) {
-        super(key, values);
-    }
+  @JsonCreator
+  public QueryParameter(
+      @JsonProperty("key") String key, @JsonProperty("values") List<String> values) {
+    super(key, values);
+  }
 
-    public static QueryParameter queryParam(String key, String... values) {
-        return new QueryParameter(key, asList(values));
-    }
+  public static QueryParameter queryParam(String key, String... values) {
+    return new QueryParameter(key, asList(values));
+  }
 
-    public static QueryParameter absent(String key) {
-        return new QueryParameter(key, Collections.<String>emptyList());
-    }
+  public static QueryParameter absent(String key) {
+    return new QueryParameter(key, Collections.<String>emptyList());
+  }
 
-    @JsonIgnore
-    @Override
-    public boolean isPresent() {
-        return super.isPresent();
-    }
+  @JsonIgnore
+  @Override
+  public boolean isPresent() {
+    return super.isPresent();
+  }
 
-    @JsonProperty
-    @Override
-    public String key() {
-        return super.key();
-    }
+  @JsonProperty
+  @Override
+  public String key() {
+    return super.key();
+  }
 
-    @JsonProperty
-    @Override
-    public List<String> values() {
-        return super.values();
-    }
+  @JsonProperty
+  @Override
+  public List<String> values() {
+    return super.values();
+  }
 
-    @JsonIgnore
-    @Override
-    public boolean isSingleValued() {
-        return super.isSingleValued();
-    }
+  @JsonIgnore
+  @Override
+  public boolean isSingleValued() {
+    return super.isSingleValued();
+  }
 }

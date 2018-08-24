@@ -17,63 +17,64 @@ package wiremock.http;
 
 import static wiremock.common.LocalNotifier.notifier;
 
+import java.util.Map;
 import wiremock.core.Admin;
 import wiremock.core.StubServer;
 import wiremock.extension.Parameters;
 import wiremock.extension.PostServeAction;
 import wiremock.stubbing.ServeEvent;
 import wiremock.verification.RequestJournal;
-import java.util.Map;
 
 public class StubRequestHandler extends AbstractRequestHandler {
-	
-	private final StubServer stubServer;
-    private final Admin admin;
-    private final Map<String, PostServeAction> postServeActions;
-    private final RequestJournal requestJournal;
 
-	public StubRequestHandler(StubServer stubServer,
-                              ResponseRenderer responseRenderer,
-                              Admin admin,
-                              Map<String, PostServeAction> postServeActions,
-                              RequestJournal requestJournal) {
-		super(responseRenderer);
-		this.stubServer = stubServer;
-        this.admin = admin;
-        this.postServeActions = postServeActions;
-        this.requestJournal = requestJournal;
+  private final StubServer stubServer;
+  private final Admin admin;
+  private final Map<String, PostServeAction> postServeActions;
+  private final RequestJournal requestJournal;
+
+  public StubRequestHandler(
+      StubServer stubServer,
+      ResponseRenderer responseRenderer,
+      Admin admin,
+      Map<String, PostServeAction> postServeActions,
+      RequestJournal requestJournal) {
+    super(responseRenderer);
+    this.stubServer = stubServer;
+    this.admin = admin;
+    this.postServeActions = postServeActions;
+    this.requestJournal = requestJournal;
+  }
+
+  @Override
+  public ServeEvent handleRequest(Request request) {
+    return stubServer.serveStubFor(request);
+  }
+
+  @Override
+  protected boolean logRequests() {
+    return true;
+  }
+
+  @Override
+  protected void beforeResponseSent(ServeEvent serveEvent, Response response) {
+    requestJournal.requestReceived(serveEvent);
+  }
+
+  @Override
+  protected void afterResponseSent(ServeEvent serveEvent, Response response) {
+    for (PostServeAction postServeAction : postServeActions.values()) {
+      postServeAction.doGlobalAction(serveEvent, admin);
     }
 
-	@Override
-	public ServeEvent handleRequest(Request request) {
-		return stubServer.serveStubFor(request);
-	}
-
-	@Override
-	protected boolean logRequests() {
-		return true;
-	}
-
-    @Override
-    protected void beforeResponseSent(ServeEvent serveEvent, Response response) {
-        requestJournal.requestReceived(serveEvent);
+    Map<String, Parameters> postServeActionRefs = serveEvent.getPostServeActions();
+    for (Map.Entry<String, Parameters> postServeActionEntry : postServeActionRefs.entrySet()) {
+      PostServeAction action = postServeActions.get(postServeActionEntry.getKey());
+      if (action != null) {
+        Parameters parameters = postServeActionEntry.getValue();
+        action.doAction(serveEvent, admin, parameters);
+      } else {
+        notifier().error("No extension was found named \"" + postServeActionEntry.getKey() + "\"");
+      }
     }
-
-    @Override
-    protected void afterResponseSent(ServeEvent serveEvent, Response response) {
-        for (PostServeAction postServeAction: postServeActions.values()) {
-            postServeAction.doGlobalAction(serveEvent, admin);
-        }
-
-        Map<String, Parameters> postServeActionRefs = serveEvent.getPostServeActions();
-        for (Map.Entry<String, Parameters> postServeActionEntry: postServeActionRefs.entrySet()) {
-            PostServeAction action = postServeActions.get(postServeActionEntry.getKey());
-            if (action != null) {
-                Parameters parameters = postServeActionEntry.getValue();
-                action.doAction(serveEvent, admin, parameters);
-            } else {
-                notifier().error("No extension was found named \"" + postServeActionEntry.getKey() + "\"");
-            }
-        }
-    }
+  }
 }

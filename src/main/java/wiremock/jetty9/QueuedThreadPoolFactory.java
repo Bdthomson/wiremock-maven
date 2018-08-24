@@ -15,15 +15,15 @@
  */
 package wiremock.jetty9;
 
-import wiremock.core.Options;
-import wiremock.http.ThreadPoolFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
+import wiremock.core.Options;
+import wiremock.http.ThreadPoolFactory;
 
 public class QueuedThreadPoolFactory implements ThreadPoolFactory {
 
-    @Override
-    public ThreadPool buildThreadPool(Options options) {
-        return new QueuedThreadPool(options.containerThreads());
-    }
+  @Override
+  public ThreadPool buildThreadPool(Options options) {
+    return new QueuedThreadPool(options.containerThreads());
+  }
 }

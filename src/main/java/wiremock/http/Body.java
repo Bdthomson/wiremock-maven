@@ -21,104 +21,101 @@ import static wiremock.common.Strings.stringFromBytes;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.NullNode;
+import java.util.Arrays;
+import java.util.Objects;
 import wiremock.common.ContentTypes;
 import wiremock.common.Json;
 import wiremock.common.Strings;
-import java.util.Arrays;
-import java.util.Objects;
 
 public class Body {
 
-    private final byte[] content;
-    private final boolean binary;
+  private final byte[] content;
+  private final boolean binary;
 
-    public Body(byte[] content) {
-        this(content, true);
-    }
+  public Body(byte[] content) {
+    this(content, true);
+  }
 
-    private Body(byte[] content, boolean binary) {
-        this.content = content;
-        this.binary = binary;
-    }
+  private Body(byte[] content, boolean binary) {
+    this.content = content;
+    this.binary = binary;
+  }
 
-    public Body(String content) {
-        this.content = Strings.bytesFromString(content);
-        binary = false;
-    }
+  public Body(String content) {
+    this.content = Strings.bytesFromString(content);
+    binary = false;
+  }
 
-    public Body(JsonNode content) {
-        this.content = Json.toByteArray(content);
-        binary = false;
-    }
+  public Body(JsonNode content) {
+    this.content = Json.toByteArray(content);
+    binary = false;
+  }
 
-    static Body fromBytes(byte[] bytes) {
-        return bytes != null ? new Body(bytes) : none();
-    }
+  static Body fromBytes(byte[] bytes) {
+    return bytes != null ? new Body(bytes) : none();
+  }
 
-    static Body fromString(String str) {
-        return str != null ? new Body(str) : none();
-    }
+  static Body fromString(String str) {
+    return str != null ? new Body(str) : none();
+  }
 
-    public static Body ofBinaryOrText(byte[] content, ContentTypeHeader contentTypeHeader) {
-        return new Body(content, ContentTypes.determineIsTextFromMimeType(contentTypeHeader.mimeTypePart()));
-    }
+  public static Body ofBinaryOrText(byte[] content, ContentTypeHeader contentTypeHeader) {
+    return new Body(
+        content, ContentTypes.determineIsTextFromMimeType(contentTypeHeader.mimeTypePart()));
+  }
 
-    public static Body fromOneOf(byte[] bytes, String str, JsonNode json, String base64) {
-        if (bytes != null) return new Body(bytes);
-        if (str != null) return new Body(str);
-        if (json != null && !(json instanceof NullNode)) return new Body(json);
-        if (base64 != null) return new Body(decodeBase64(base64), true);
+  public static Body fromOneOf(byte[] bytes, String str, JsonNode json, String base64) {
+    if (bytes != null) return new Body(bytes);
+    if (str != null) return new Body(str);
+    if (json != null && !(json instanceof NullNode)) return new Body(json);
+    if (base64 != null) return new Body(decodeBase64(base64), true);
 
-        return none();
-    }
+    return none();
+  }
 
-    public static Body none() {
-        return new Body((byte[]) null);
-    }
+  public static Body none() {
+    return new Body((byte[]) null);
+  }
 
-    public String asString() {
-        return content != null ? stringFromBytes(content) : null;
-    }
+  public String asString() {
+    return content != null ? stringFromBytes(content) : null;
+  }
 
-    public byte[] asBytes() {
-        return content != null ? content : null;
-    }
+  public byte[] asBytes() {
+    return content != null ? content : null;
+  }
 
-    public String asBase64() {
-        return encodeBase64(content);
-    }
+  public String asBase64() {
+    return encodeBase64(content);
+  }
 
-    public boolean isBinary() {
-        return binary;
-    }
+  public boolean isBinary() {
+    return binary;
+  }
 
-    public boolean isAbsent() {
-        return content == null;
-    }
+  public boolean isAbsent() {
+    return content == null;
+  }
 
-    public boolean isPresent() {
-        return !isAbsent();
-    }
+  public boolean isPresent() {
+    return !isAbsent();
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Body body = (Body) o;
-        return Objects.equals(binary, body.binary) &&
-                Arrays.equals(content, body.content);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Body body = (Body) o;
+    return Objects.equals(binary, body.binary) && Arrays.equals(content, body.content);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(content, binary);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(content, binary);
+  }
 
-    @Override
-    public String toString() {
-        return "Body {" +
-                "content=" + asString() +
-                ", binary=" + binary +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "Body {" + "content=" + asString() + ", binary=" + binary + '}';
+  }
 }

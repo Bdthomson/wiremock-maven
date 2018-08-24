@@ -15,12 +15,15 @@
  */
 package wiremock.core;
 
-import wiremock.stubbing.StubMapping;
 import java.util.List;
+import wiremock.stubbing.StubMapping;
 
 public interface MappingsSaver {
-    void save(List<StubMapping> stubMappings);
-    void save(StubMapping stubMapping);
-    void remove(StubMapping stubMapping);
-    void removeAll();
+  void save(List<StubMapping> stubMappings);
+
+  void save(StubMapping stubMapping);
+
+  void remove(StubMapping stubMapping);
+
+  void removeAll();
 }

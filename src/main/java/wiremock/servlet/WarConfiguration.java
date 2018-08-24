@@ -15,6 +15,11 @@
  */
 package wiremock.servlet;
 
+import com.google.common.base.Optional;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import javax.servlet.ServletContext;
 import wiremock.common.*;
 import wiremock.core.MappingsSaver;
 import wiremock.core.Options;
@@ -30,144 +35,139 @@ import wiremock.standalone.JsonFileMappingsSource;
 import wiremock.standalone.MappingsLoader;
 import wiremock.verification.notmatched.NotMatchedRenderer;
 import wiremock.verification.notmatched.PlainTextStubNotMatchedRenderer;
-import com.google.common.base.Optional;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import javax.servlet.ServletContext;
 
 public class WarConfiguration implements Options {
 
-    private static final String FILE_SOURCE_ROOT_KEY = "WireMockFileSourceRoot";
+  private static final String FILE_SOURCE_ROOT_KEY = "WireMockFileSourceRoot";
 
-    private final ServletContext servletContext;
+  private final ServletContext servletContext;
 
-    public WarConfiguration(ServletContext servletContext) {
-        this.servletContext = servletContext;
+  public WarConfiguration(ServletContext servletContext) {
+    this.servletContext = servletContext;
+  }
+
+  @Override
+  public int portNumber() {
+    return 0;
+  }
+
+  @Override
+  public HttpsSettings httpsSettings() {
+    return new HttpsSettings.Builder().build();
+  }
+
+  @Override
+  public JettySettings jettySettings() {
+    return null;
+  }
+
+  @Override
+  public int containerThreads() {
+    return 0;
+  }
+
+  @Override
+  public boolean browserProxyingEnabled() {
+    return false;
+  }
+
+  @Override
+  public ProxySettings proxyVia() {
+    return ProxySettings.NO_PROXY;
+  }
+
+  @Override
+  public FileSource filesRoot() {
+    String fileSourceRoot = servletContext.getInitParameter(FILE_SOURCE_ROOT_KEY);
+    return new ServletContextFileSource(servletContext, fileSourceRoot);
+  }
+
+  @Override
+  public MappingsLoader mappingsLoader() {
+    return new JsonFileMappingsSource(filesRoot().child("mappings"));
+  }
+
+  @Override
+  public MappingsSaver mappingsSaver() {
+    return new NotImplementedMappingsSaver();
+  }
+
+  @Override
+  public Notifier notifier() {
+    return null;
+  }
+
+  @Override
+  public boolean requestJournalDisabled() {
+    return false;
+  }
+
+  @Override
+  public Optional<Integer> maxRequestJournalEntries() {
+    String str = servletContext.getInitParameter("maxRequestJournalEntries");
+    if (str == null) {
+      return Optional.absent();
     }
+    return Optional.of(Integer.parseInt(str));
+  }
 
-    @Override
-    public int portNumber() {
-        return 0;
-    }
+  @Override
+  public String bindAddress() {
+    return null;
+  }
 
-    @Override
-    public HttpsSettings httpsSettings() {
-        return new HttpsSettings.Builder().build();
-    }
+  @Override
+  public List<CaseInsensitiveKey> matchingHeaders() {
+    return Collections.emptyList();
+  }
 
-    @Override
-    public JettySettings jettySettings() {
-        return null;
-    }
+  @Override
+  public boolean shouldPreserveHostHeader() {
+    return false;
+  }
 
-    @Override
-    public int containerThreads() {
-        return 0;
-    }
+  @Override
+  public String proxyHostHeader() {
+    return null;
+  }
 
-    @Override
-    public boolean browserProxyingEnabled() {
-        return false;
-    }
+  @Override
+  public HttpServerFactory httpServerFactory() {
+    return null;
+  }
 
-    @Override
-    public ProxySettings proxyVia() {
-        return ProxySettings.NO_PROXY;
-    }
+  @Override
+  public ThreadPoolFactory threadPoolFactory() {
+    return null;
+  }
 
-    @Override
-    public FileSource filesRoot() {
-        String fileSourceRoot = servletContext.getInitParameter(FILE_SOURCE_ROOT_KEY);
-        return new ServletContextFileSource(servletContext, fileSourceRoot);
-    }
+  @Override
+  public <T extends Extension> Map<String, T> extensionsOfType(Class<T> extensionType) {
+    return Collections.emptyMap();
+  }
 
-    @Override
-    public MappingsLoader mappingsLoader() {
-        return new JsonFileMappingsSource(filesRoot().child("mappings"));
-    }
+  @Override
+  public WiremockNetworkTrafficListener networkTrafficListener() {
+    return new DoNothingWiremockNetworkTrafficListener();
+  }
 
-    @Override
-    public MappingsSaver mappingsSaver() {
-        return new NotImplementedMappingsSaver();
-    }
+  @Override
+  public Authenticator getAdminAuthenticator() {
+    return new NoAuthenticator();
+  }
 
-    @Override
-    public Notifier notifier() {
-        return null;
-    }
+  @Override
+  public boolean getHttpsRequiredForAdminApi() {
+    return false;
+  }
 
-    @Override
-    public boolean requestJournalDisabled() {
-        return false;
-    }
+  @Override
+  public NotMatchedRenderer getNotMatchedRenderer() {
+    return new PlainTextStubNotMatchedRenderer();
+  }
 
-    @Override
-    public Optional<Integer> maxRequestJournalEntries() {
-        String str = servletContext.getInitParameter("maxRequestJournalEntries");
-        if(str == null) {
-            return Optional.absent();
-        }
-        return Optional.of(Integer.parseInt(str));
-    }
-
-    @Override
-    public String bindAddress() {
-        return null;
-    }
-
-    @Override
-    public List<CaseInsensitiveKey> matchingHeaders() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public boolean shouldPreserveHostHeader() {
-        return false;
-    }
-
-    @Override
-    public String proxyHostHeader() {
-        return null;
-    }
-
-    @Override
-    public HttpServerFactory httpServerFactory() {
-        return null;
-    }
-
-    @Override
-    public ThreadPoolFactory threadPoolFactory() {
-        return null;
-    }
-
-    @Override
-    public <T extends Extension> Map<String, T> extensionsOfType(Class<T> extensionType) {
-        return Collections.emptyMap();
-    }
-
-    @Override
-    public WiremockNetworkTrafficListener networkTrafficListener() {
-        return new DoNothingWiremockNetworkTrafficListener();
-    }
-
-    @Override
-    public Authenticator getAdminAuthenticator() {
-        return new NoAuthenticator();
-    }
-
-    @Override
-    public boolean getHttpsRequiredForAdminApi() {
-        return false;
-    }
-
-    @Override
-    public NotMatchedRenderer getNotMatchedRenderer() {
-        return new PlainTextStubNotMatchedRenderer();
-    }
-
-    @Override
-    public AsynchronousResponseSettings getAsynchronousResponseSettings() {
-        return new AsynchronousResponseSettings(false, 0);
-    }
+  @Override
+  public AsynchronousResponseSettings getAsynchronousResponseSettings() {
+    return new AsynchronousResponseSettings(false, 0);
+  }
 }

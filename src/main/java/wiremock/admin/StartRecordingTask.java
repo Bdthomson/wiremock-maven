@@ -27,14 +27,14 @@ import wiremock.recording.RecordSpec;
 
 public class StartRecordingTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        RecordSpec recordSpec = Json.read(request.getBodyAsString(), RecordSpec.class);
-        try {
-            admin.startRecording(recordSpec);
-            return ResponseDefinition.okEmptyJson();
-        } catch (InvalidInputException e) {
-            return jsonResponse(e.getErrors(), 422);
-        }
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    RecordSpec recordSpec = Json.read(request.getBodyAsString(), RecordSpec.class);
+    try {
+      admin.startRecording(recordSpec);
+      return ResponseDefinition.okEmptyJson();
+    } catch (InvalidInputException e) {
+      return jsonResponse(e.getErrors(), 422);
     }
+  }
 }

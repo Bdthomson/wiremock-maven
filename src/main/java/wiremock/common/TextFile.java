@@ -22,15 +22,15 @@ import java.net.URI;
 
 public class TextFile extends BinaryFile {
 
-	public TextFile(URI uri) {
-        super(uri);
-	}
-	
-	public String readContentsAsString() {
-        return new String(super.readContents(), UTF_8);
-	}
+  public TextFile(URI uri) {
+    super(uri);
+  }
 
-    public String getPath() {
-        return new File(getUri().getSchemeSpecificPart()).getPath();
-    }
+  public String readContentsAsString() {
+    return new String(super.readContents(), UTF_8);
+  }
+
+  public String getPath() {
+    return new File(getUri().getSchemeSpecificPart()).getPath();
+  }
 }

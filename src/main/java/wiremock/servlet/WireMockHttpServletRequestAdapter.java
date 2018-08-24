@@ -93,8 +93,7 @@ public class WireMockHttpServletRequestAdapter implements Request {
 
   @Override
   public String getAbsoluteUrl() {
-    return withQueryStringIfPresent(request.getRequestURL()
-        .toString());
+    return withQueryStringIfPresent(request.getRequestURL().toString());
   }
 
   private String withQueryStringIfPresent(String url) {
@@ -103,8 +102,7 @@ public class WireMockHttpServletRequestAdapter implements Request {
 
   @Override
   public RequestMethod getMethod() {
-    return RequestMethod.fromString(request.getMethod()
-        .toUpperCase());
+    return RequestMethod.fromString(request.getMethod().toUpperCase());
   }
 
   @Override
@@ -176,8 +174,7 @@ public class WireMockHttpServletRequestAdapter implements Request {
   public String getHeader(String key) {
     List<String> headerNames = list(request.getHeaderNames());
     for (String currentKey : headerNames) {
-      if (currentKey.toLowerCase()
-          .equals(key.toLowerCase())) {
+      if (currentKey.toLowerCase().equals(key.toLowerCase())) {
         return request.getHeader(currentKey);
       }
     }
@@ -190,8 +187,7 @@ public class WireMockHttpServletRequestAdapter implements Request {
   public HttpHeader header(String key) {
     List<String> headerNames = list(request.getHeaderNames());
     for (String currentKey : headerNames) {
-      if (currentKey.toLowerCase()
-          .equals(key.toLowerCase())) {
+      if (currentKey.toLowerCase().equals(key.toLowerCase())) {
         List<String> valueList = list(request.getHeaders(currentKey));
         if (valueList.isEmpty()) {
           return HttpHeader.empty(key);
@@ -240,25 +236,26 @@ public class WireMockHttpServletRequestAdapter implements Request {
   public Map<String, Cookie> getCookies() {
     ImmutableMultimap.Builder<String, String> builder = ImmutableMultimap.builder();
 
-    javax.servlet.http.Cookie[] cookies = firstNonNull(request.getCookies(),
-        new javax.servlet.http.Cookie[0]);
+    javax.servlet.http.Cookie[] cookies =
+        firstNonNull(request.getCookies(), new javax.servlet.http.Cookie[0]);
     for (javax.servlet.http.Cookie cookie : cookies) {
       builder.put(cookie.getName(), cookie.getValue());
     }
 
-    return Maps.transformValues(builder.build()
-        .asMap(), new Function<Collection<String>, Cookie>() {
-      @Override
-      public Cookie apply(Collection<String> input) {
-        return new Cookie(null, ImmutableList.copyOf(input));
-      }
-    });
+    return Maps.transformValues(
+        builder.build().asMap(),
+        new Function<Collection<String>, Cookie>() {
+          @Override
+          public Cookie apply(Collection<String> input) {
+            return new Cookie(null, ImmutableList.copyOf(input));
+          }
+        });
   }
 
   @Override
   public QueryParameter queryParameter(String key) {
-    return firstNonNull((splitQuery(request.getQueryString()).get(key)),
-        QueryParameter.absent(key));
+    return firstNonNull(
+        (splitQuery(request.getQueryString()).get(key)), QueryParameter.absent(key));
   }
 
   @Override
@@ -268,8 +265,7 @@ public class WireMockHttpServletRequestAdapter implements Request {
     }
     if (request instanceof org.eclipse.jetty.server.Request) {
       org.eclipse.jetty.server.Request jettyRequest = (org.eclipse.jetty.server.Request) request;
-      return JettyUtils.getUri(jettyRequest)
-          .isAbsolute();
+      return JettyUtils.getUri(jettyRequest).isAbsolute();
     }
 
     return false;
@@ -286,18 +282,20 @@ public class WireMockHttpServletRequestAdapter implements Request {
       try {
         String contentTypeHeaderValue = from(contentTypeHeader().values()).join(Joiner.on(" "));
         InputStream inputStream = new ByteArrayInputStream(getBody());
-        MultiPartInputStreamParser inputStreamParser = new MultiPartInputStreamParser(inputStream,
-            contentTypeHeaderValue, null, null);
-        request.setAttribute(org.eclipse.jetty.server.Request.__MULTIPART_INPUT_STREAM,
-            inputStreamParser);
-        cachedMultiparts = from(safelyGetRequestParts()).transform(
-            new Function<javax.servlet.http.Part, Part>() {
-              @Override
-              public Part apply(javax.servlet.http.Part input) {
-                return WireMockHttpServletMultipartAdapter.from(input);
-              }
-            })
-            .toList();
+        MultiPartInputStreamParser inputStreamParser =
+            new MultiPartInputStreamParser(inputStream, contentTypeHeaderValue, null, null);
+        request.setAttribute(
+            org.eclipse.jetty.server.Request.__MULTIPART_INPUT_STREAM, inputStreamParser);
+        cachedMultiparts =
+            from(safelyGetRequestParts())
+                .transform(
+                    new Function<javax.servlet.http.Part, Part>() {
+                      @Override
+                      public Part apply(javax.servlet.http.Part input) {
+                        return WireMockHttpServletMultipartAdapter.from(input);
+                      }
+                    })
+                .toList();
       } catch (IOException | ServletException exception) {
         return throwUnchecked(exception, Collection.class);
       }
@@ -311,8 +309,7 @@ public class WireMockHttpServletRequestAdapter implements Request {
     try {
       return request.getParts();
     } catch (IOException ioe) {
-      if (ioe.getMessage()
-          .contains("Missing content for multipart")) {
+      if (ioe.getMessage().contains("Missing content for multipart")) {
         return Collections.emptyList();
       }
 
@@ -336,12 +333,14 @@ public class WireMockHttpServletRequestAdapter implements Request {
         return null;
       }
     }
-    return from(cachedMultiparts).firstMatch(new Predicate<Part>() {
-      @Override
-      public boolean apply(Part input) {
-        return name.equals(input.getName());
-      }
-    })
+    return from(cachedMultiparts)
+        .firstMatch(
+            new Predicate<Part>() {
+              @Override
+              public boolean apply(Part input) {
+                return name.equals(input.getName());
+              }
+            })
         .get();
   }
 
@@ -361,8 +360,7 @@ public class WireMockHttpServletRequestAdapter implements Request {
   }
 
   private void getClass(String type) throws ClassNotFoundException {
-    ClassLoader contextCL = Thread.currentThread()
-        .getContextClassLoader();
+    ClassLoader contextCL = Thread.currentThread().getContextClassLoader();
     ClassLoader loader =
         contextCL == null ? WireMockHttpServletRequestAdapter.class.getClassLoader() : contextCL;
     Class.forName(type, false, loader);

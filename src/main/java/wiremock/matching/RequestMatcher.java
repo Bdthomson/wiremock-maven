@@ -15,23 +15,23 @@
  */
 package wiremock.matching;
 
-import wiremock.http.Request;
 import java.util.Objects;
+import wiremock.http.Request;
 
 public abstract class RequestMatcher implements NamedValueMatcher<Request> {
 
-    @Override
-    public String getExpected() {
-        return "(custom request matcher - override this for meaningful diff)";
-    }
+  @Override
+  public String getExpected() {
+    return "(custom request matcher - override this for meaningful diff)";
+  }
 
-    @Override
-    public int hashCode() {
-        return this.getClass().hashCode();
-    }
+  @Override
+  public int hashCode() {
+    return this.getClass().hashCode();
+  }
 
-    @Override
-    public boolean equals(Object obj) {
-        return Objects.equals(this.getClass(), obj.getClass());
-    }
+  @Override
+  public boolean equals(Object obj) {
+    return Objects.equals(this.getClass(), obj.getClass());
+  }
 }

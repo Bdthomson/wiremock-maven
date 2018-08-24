@@ -29,39 +29,41 @@ import org.eclipse.jetty.server.Response;
 
 public class JettyUtils {
 
-    public static Response unwrapResponse(HttpServletResponse httpServletResponse) {
-        if (httpServletResponse instanceof HttpServletResponseWrapper) {
-            ServletResponse unwrapped = ((HttpServletResponseWrapper) httpServletResponse).getResponse();
-            return (Response) unwrapped;
-        }
-
-        return (Response) httpServletResponse;
+  public static Response unwrapResponse(HttpServletResponse httpServletResponse) {
+    if (httpServletResponse instanceof HttpServletResponseWrapper) {
+      ServletResponse unwrapped = ((HttpServletResponseWrapper) httpServletResponse).getResponse();
+      return (Response) unwrapped;
     }
 
-    public static Socket getTlsSocket(Response response) {
-        HttpChannel httpChannel = response.getHttpOutput().getHttpChannel();
-        SslConnection.DecryptedEndPoint sslEndpoint = (SslConnection.DecryptedEndPoint) httpChannel.getEndPoint();
-        Object endpoint = sslEndpoint.getSslConnection().getEndPoint();
-        try {
-            return (Socket) endpoint.getClass().getMethod("getSocket").invoke(endpoint);
-        } catch (Exception e) {
-            return throwUnchecked(e, Socket.class);
-        }
-    }
+    return (Response) httpServletResponse;
+  }
 
-    public static URI getUri(Request request) {
-        try {
-            return toUri(request.getClass().getDeclaredMethod("getUri").invoke(request));
-        } catch (Exception ignored) {
-            try {
-                return toUri(request.getClass().getDeclaredMethod("getHttpURI").invoke(request));
-            } catch (Exception ignored2) {
-                throw new IllegalArgumentException(request + " does not have a getUri or getHttpURI method");
-            }
-        }
+  public static Socket getTlsSocket(Response response) {
+    HttpChannel httpChannel = response.getHttpOutput().getHttpChannel();
+    SslConnection.DecryptedEndPoint sslEndpoint =
+        (SslConnection.DecryptedEndPoint) httpChannel.getEndPoint();
+    Object endpoint = sslEndpoint.getSslConnection().getEndPoint();
+    try {
+      return (Socket) endpoint.getClass().getMethod("getSocket").invoke(endpoint);
+    } catch (Exception e) {
+      return throwUnchecked(e, Socket.class);
     }
+  }
 
-    private static URI toUri(Object httpURI) {
-        return URI.create(httpURI.toString());
+  public static URI getUri(Request request) {
+    try {
+      return toUri(request.getClass().getDeclaredMethod("getUri").invoke(request));
+    } catch (Exception ignored) {
+      try {
+        return toUri(request.getClass().getDeclaredMethod("getHttpURI").invoke(request));
+      } catch (Exception ignored2) {
+        throw new IllegalArgumentException(
+            request + " does not have a getUri or getHttpURI method");
+      }
     }
+  }
+
+  private static URI toUri(Object httpURI) {
+    return URI.create(httpURI.toString());
+  }
 }

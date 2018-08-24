@@ -16,17 +16,17 @@
 package wiremock.admin.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import wiremock.stubbing.StubMapping;
 import com.google.common.base.Optional;
+import wiremock.stubbing.StubMapping;
 
 public class SingleStubMappingResult extends SingleItemResult<StubMapping> {
 
-    @JsonCreator
-    public SingleStubMappingResult(StubMapping item) {
-        super(item);
-    }
+  @JsonCreator
+  public SingleStubMappingResult(StubMapping item) {
+    super(item);
+  }
 
-    public static SingleStubMappingResult fromOptional(Optional<StubMapping> optional) {
-        return new SingleStubMappingResult(optional.orNull());
-    }
+  public static SingleStubMappingResult fromOptional(Optional<StubMapping> optional) {
+    return new SingleStubMappingResult(optional.orNull());
+  }
 }

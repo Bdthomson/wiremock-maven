@@ -15,38 +15,49 @@
  */
 package wiremock.client;
 
+import java.util.Map;
+import java.util.UUID;
 import wiremock.common.Metadata;
 import wiremock.matching.ContentPattern;
 import wiremock.matching.MultipartValuePatternBuilder;
 import wiremock.matching.StringValuePattern;
 import wiremock.stubbing.StubMapping;
-import java.util.Map;
-import java.util.UUID;
 
 public interface MappingBuilder {
 
-    MappingBuilder atPriority(Integer priority);
-    MappingBuilder withHeader(String key, StringValuePattern headerPattern);
-    MappingBuilder withQueryParam(String key, StringValuePattern queryParamPattern);
-    MappingBuilder withQueryParams(Map<String, StringValuePattern> queryParams);
-    MappingBuilder withRequestBody(ContentPattern<?> bodyPattern);
-    MappingBuilder withMultipartRequestBody(MultipartValuePatternBuilder multipartPatternBuilder);
-    ScenarioMappingBuilder inScenario(String scenarioName);
-    MappingBuilder withId(UUID id);
-    MappingBuilder withName(String name);
+  MappingBuilder atPriority(Integer priority);
 
-    MappingBuilder persistent();
-    MappingBuilder withBasicAuth(String username, String password);
+  MappingBuilder withHeader(String key, StringValuePattern headerPattern);
 
-    MappingBuilder withCookie(String name, StringValuePattern cookieValuePattern);
+  MappingBuilder withQueryParam(String key, StringValuePattern queryParamPattern);
 
-    <P> MappingBuilder withPostServeAction(String extensionName, P parameters);
+  MappingBuilder withQueryParams(Map<String, StringValuePattern> queryParams);
 
-    MappingBuilder withMetadata(Map<String, ?> metadata);
-    MappingBuilder withMetadata(Metadata metadata);
-    MappingBuilder withMetadata(Metadata.Builder metadata);
+  MappingBuilder withRequestBody(ContentPattern<?> bodyPattern);
 
-    MappingBuilder willReturn(ResponseDefinitionBuilder responseDefBuilder);
+  MappingBuilder withMultipartRequestBody(MultipartValuePatternBuilder multipartPatternBuilder);
 
-    StubMapping build();
+  ScenarioMappingBuilder inScenario(String scenarioName);
+
+  MappingBuilder withId(UUID id);
+
+  MappingBuilder withName(String name);
+
+  MappingBuilder persistent();
+
+  MappingBuilder withBasicAuth(String username, String password);
+
+  MappingBuilder withCookie(String name, StringValuePattern cookieValuePattern);
+
+  <P> MappingBuilder withPostServeAction(String extensionName, P parameters);
+
+  MappingBuilder withMetadata(Map<String, ?> metadata);
+
+  MappingBuilder withMetadata(Metadata metadata);
+
+  MappingBuilder withMetadata(Metadata.Builder metadata);
+
+  MappingBuilder willReturn(ResponseDefinitionBuilder responseDefBuilder);
+
+  StubMapping build();
 }

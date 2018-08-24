@@ -6,50 +6,51 @@ import java.util.TimeZone;
 
 public class DateOffset {
 
-    public enum Unit {
-        SECONDS(Calendar.SECOND),
-        MINUTES(Calendar.MINUTE),
-        HOURS(Calendar.HOUR),
-        DAYS(Calendar.DAY_OF_MONTH),
-        MONTHS(Calendar.MONTH),
-        YEARS(Calendar.YEAR);
+  public enum Unit {
+    SECONDS(Calendar.SECOND),
+    MINUTES(Calendar.MINUTE),
+    HOURS(Calendar.HOUR),
+    DAYS(Calendar.DAY_OF_MONTH),
+    MONTHS(Calendar.MONTH),
+    YEARS(Calendar.YEAR);
 
-        private final int calendarField;
+    private final int calendarField;
 
-        Unit(int calendarField) {
-            this.calendarField = calendarField;
-        }
-
-        public int getCalendarField() {
-            return calendarField;
-        }
+    Unit(int calendarField) {
+      this.calendarField = calendarField;
     }
 
-    private final Unit timeUnit;
-    private final int amount;
+    public int getCalendarField() {
+      return calendarField;
+    }
+  }
 
-    public DateOffset(String offset) {
-        String[] parts = offset.split(" ");
-        if (parts.length != 2) {
-            throw new IllegalArgumentException("Offset must be of the form <amount> <unit> e.g. 8 seconds");
-        }
+  private final Unit timeUnit;
+  private final int amount;
 
-        amount = Integer.parseInt(parts[0]);
-        timeUnit = Unit.valueOf(parts[1].toUpperCase());
+  public DateOffset(String offset) {
+    String[] parts = offset.split(" ");
+    if (parts.length != 2) {
+      throw new IllegalArgumentException(
+          "Offset must be of the form <amount> <unit> e.g. 8 seconds");
     }
 
-    public Unit getTimeUnit() {
-        return timeUnit;
-    }
+    amount = Integer.parseInt(parts[0]);
+    timeUnit = Unit.valueOf(parts[1].toUpperCase());
+  }
 
-    public int getAmount() {
-        return amount;
-    }
+  public Unit getTimeUnit() {
+    return timeUnit;
+  }
 
-    public Date shift(Date date) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Z"));
-        calendar.setTime(date);
-        calendar.add(timeUnit.calendarField, amount);
-        return calendar.getTime();
-    }
+  public int getAmount() {
+    return amount;
+  }
+
+  public Date shift(Date date) {
+    Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Z"));
+    calendar.setTime(date);
+    calendar.add(timeUnit.calendarField, amount);
+    return calendar.getTime();
+  }
 }

@@ -20,8 +20,8 @@ import wiremock.matching.EqualToXmlPattern;
 
 public class RequestBodyEqualToXmlPatternFactory implements RequestBodyPatternFactory {
 
-    @Override
-    public EqualToXmlPattern forRequest(Request request) {
-        return new EqualToXmlPattern(request.getBodyAsString());
-    }
+  @Override
+  public EqualToXmlPattern forRequest(Request request) {
+    return new EqualToXmlPattern(request.getBodyAsString());
+  }
 }

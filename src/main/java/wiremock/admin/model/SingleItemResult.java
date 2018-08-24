@@ -24,19 +24,19 @@ import com.fasterxml.jackson.annotation.JsonValue;
 @JsonInclude(NON_NULL)
 public class SingleItemResult<T> {
 
-    private final T item;
+  private final T item;
 
-    public SingleItemResult(T item) {
-        this.item = item;
-    }
+  public SingleItemResult(T item) {
+    this.item = item;
+  }
 
-    @JsonValue
-    public T getItem() {
-        return item;
-    }
+  @JsonValue
+  public T getItem() {
+    return item;
+  }
 
-    @JsonIgnore
-    public boolean isPresent() {
-        return item != null;
-    }
+  @JsonIgnore
+  public boolean isPresent() {
+    return item != null;
+  }
 }

@@ -16,9 +16,13 @@
 package wiremock.http;
 
 public interface HttpServer {
-    void start();
-    void stop();
-    boolean isRunning();
-    int port();
-    int httpsPort();
+  void start();
+
+  void stop();
+
+  boolean isRunning();
+
+  int port();
+
+  int httpsPort();
 }

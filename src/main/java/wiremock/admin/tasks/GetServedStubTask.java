@@ -15,25 +15,24 @@
  */
 package wiremock.admin.tasks;
 
+import java.util.UUID;
 import wiremock.admin.AdminTask;
 import wiremock.admin.model.PathParams;
 import wiremock.admin.model.SingleServedStubResult;
 import wiremock.core.Admin;
 import wiremock.http.Request;
 import wiremock.http.ResponseDefinition;
-import java.util.UUID;
 
 public class GetServedStubTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        String idString = pathParams.get("id");
-        UUID id = UUID.fromString(idString);
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    String idString = pathParams.get("id");
+    UUID id = UUID.fromString(idString);
 
-        SingleServedStubResult result = admin.getServedStub(id);
-        return result.isPresent() ?
-            ResponseDefinition.okForJson(result.getItem()) :
-            ResponseDefinition.notFound();
-
-    }
+    SingleServedStubResult result = admin.getServedStub(id);
+    return result.isPresent()
+        ? ResponseDefinition.okForJson(result.getItem())
+        : ResponseDefinition.notFound();
+  }
 }

@@ -15,14 +15,15 @@
  */
 package wiremock.servlet;
 
-import wiremock.core.FaultInjector;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import wiremock.core.FaultInjector;
 
 public class NoFaultInjectorFactory implements FaultInjectorFactory {
 
-    @Override
-    public FaultInjector buildFaultInjector(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
-        return new NoFaultInjector(httpServletResponse);
-    }
+  @Override
+  public FaultInjector buildFaultInjector(
+      HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    return new NoFaultInjector(httpServletResponse);
+  }
 }

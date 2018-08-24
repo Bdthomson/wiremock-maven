@@ -19,6 +19,8 @@ import wiremock.core.Options;
 
 public interface HttpServerFactory {
 
-    HttpServer buildHttpServer(Options options, AdminRequestHandler adminRequestHandler,
-        StubRequestHandler stubRequestHandler);
+  HttpServer buildHttpServer(
+      Options options,
+      AdminRequestHandler adminRequestHandler,
+      StubRequestHandler stubRequestHandler);
 }

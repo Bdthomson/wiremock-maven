@@ -19,12 +19,12 @@ import static wiremock.http.Response.response;
 
 public class BasicResponseRenderer implements ResponseRenderer {
 
-    @Override
-    public Response render(ResponseDefinition responseDefinition) {
-        return response()
-            .status(responseDefinition.getStatus())
-            .headers(responseDefinition.getHeaders())
-            .body(responseDefinition.getByteBody())
-            .build();
-    }
+  @Override
+  public Response render(ResponseDefinition responseDefinition) {
+    return response()
+        .status(responseDefinition.getStatus())
+        .headers(responseDefinition.getHeaders())
+        .body(responseDefinition.getByteBody())
+        .build();
+  }
 }

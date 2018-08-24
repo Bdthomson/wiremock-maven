@@ -29,42 +29,43 @@ import java.util.zip.GZIPOutputStream;
 
 public class Gzip {
 
-    public static byte[] unGzip(byte[] gzippedContent) {
-        try {
-            GZIPInputStream gzipInputStream = new GZIPInputStream(new ByteArrayInputStream(gzippedContent));
-            return ByteStreams.toByteArray(gzipInputStream);
-        } catch (IOException e) {
-            return throwUnchecked(e, byte[].class);
-        }
+  public static byte[] unGzip(byte[] gzippedContent) {
+    try {
+      GZIPInputStream gzipInputStream =
+          new GZIPInputStream(new ByteArrayInputStream(gzippedContent));
+      return ByteStreams.toByteArray(gzipInputStream);
+    } catch (IOException e) {
+      return throwUnchecked(e, byte[].class);
     }
+  }
 
-    public static String unGzipToString(byte[] gzippedContent) {
-        return new String(unGzip(gzippedContent));
-    }
+  public static String unGzipToString(byte[] gzippedContent) {
+    return new String(unGzip(gzippedContent));
+  }
 
-    public static byte[] gzip(String plainContent) {
-        return gzip(plainContent, DEFAULT_CHARSET);
-    }
+  public static byte[] gzip(String plainContent) {
+    return gzip(plainContent, DEFAULT_CHARSET);
+  }
 
-    public static byte[] gzip(String plainContent, Charset charset) {
-        return gzip(bytesFromString(plainContent, charset));
-    }
+  public static byte[] gzip(String plainContent, Charset charset) {
+    return gzip(bytesFromString(plainContent, charset));
+  }
 
-    public static byte[] gzip(byte[] plainContent) {
-        try {
-            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-            GZIPOutputStream gzipOutputStream = new GZIPOutputStream(bytes);
-            gzipOutputStream.write(plainContent);
-            gzipOutputStream.close();
-            return bytes.toByteArray();
-        } catch (IOException e) {
-            return throwUnchecked(e, byte[].class);
-        }
+  public static byte[] gzip(byte[] plainContent) {
+    try {
+      ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+      GZIPOutputStream gzipOutputStream = new GZIPOutputStream(bytes);
+      gzipOutputStream.write(plainContent);
+      gzipOutputStream.close();
+      return bytes.toByteArray();
+    } catch (IOException e) {
+      return throwUnchecked(e, byte[].class);
     }
+  }
 
-    public static boolean isGzipped(byte[] content) {
-        return content.length >= 2
-                && content[0] == (byte)GZIPInputStream.GZIP_MAGIC
-                && content[1] == (byte)(GZIPInputStream.GZIP_MAGIC >> 8);
-    }
+  public static boolean isGzipped(byte[] content) {
+    return content.length >= 2
+        && content[0] == (byte) GZIPInputStream.GZIP_MAGIC
+        && content[1] == (byte) (GZIPInputStream.GZIP_MAGIC >> 8);
+  }
 }

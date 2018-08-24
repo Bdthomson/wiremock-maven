@@ -15,9 +15,9 @@
  */
 package wiremock.admin.tasks;
 
+import static java.net.HttpURLConnection.HTTP_OK;
 import static wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 import static wiremock.common.Json.write;
-import static java.net.HttpURLConnection.HTTP_OK;
 
 import wiremock.admin.AdminTask;
 import wiremock.admin.model.PathParams;
@@ -30,15 +30,15 @@ import wiremock.verification.VerificationResult;
 
 public class GetRequestCountTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        RequestPattern requestPattern = Json.read(request.getBodyAsString(), RequestPattern.class);
-        VerificationResult result = admin.countRequestsMatching(requestPattern);
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    RequestPattern requestPattern = Json.read(request.getBodyAsString(), RequestPattern.class);
+    VerificationResult result = admin.countRequestsMatching(requestPattern);
 
-        return responseDefinition()
-                .withStatus(HTTP_OK)
-                .withBody(write(result))
-                .withHeader("Content-Type", "application/json")
-                .build();
-    }
+    return responseDefinition()
+        .withStatus(HTTP_OK)
+        .withBody(write(result))
+        .withHeader("Content-Type", "application/json")
+        .build();
+  }
 }

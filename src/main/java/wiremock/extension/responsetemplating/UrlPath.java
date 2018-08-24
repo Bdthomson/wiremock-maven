@@ -22,20 +22,20 @@ import org.apache.commons.lang3.StringUtils;
 
 public class UrlPath extends ArrayList<String> {
 
-    private final String originalPath;
+  private final String originalPath;
 
-    public UrlPath(String url) {
-        originalPath = URI.create(url).getPath();
-        Iterable<String> pathNodes = Splitter.on('/').split(originalPath);
-        for (String pathNode: pathNodes) {
-            if (StringUtils.isNotEmpty(pathNode)) {
-                add(pathNode);
-            }
-        }
+  public UrlPath(String url) {
+    originalPath = URI.create(url).getPath();
+    Iterable<String> pathNodes = Splitter.on('/').split(originalPath);
+    for (String pathNode : pathNodes) {
+      if (StringUtils.isNotEmpty(pathNode)) {
+        add(pathNode);
+      }
     }
+  }
 
-    @Override
-    public String toString() {
-        return originalPath;
-    }
+  @Override
+  public String toString() {
+    return originalPath;
+  }
 }

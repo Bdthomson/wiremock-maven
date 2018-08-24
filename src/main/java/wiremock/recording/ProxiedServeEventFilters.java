@@ -18,55 +18,49 @@ package wiremock.recording;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import wiremock.matching.RequestPattern;
-import wiremock.stubbing.ServeEvent;
 import com.google.common.base.Predicate;
 import java.util.List;
 import java.util.UUID;
+import wiremock.matching.RequestPattern;
+import wiremock.stubbing.ServeEvent;
 
-/**
- * A predicate to filter proxied ServeEvents against RequestPattern filters and IDs
- */
+/** A predicate to filter proxied ServeEvents against RequestPattern filters and IDs */
 public class ProxiedServeEventFilters implements Predicate<ServeEvent> {
 
-    @JsonUnwrapped
-    private final RequestPattern filters;
+  @JsonUnwrapped private final RequestPattern filters;
 
-    @JsonUnwrapped
-    private final List<UUID> ids;
+  @JsonUnwrapped private final List<UUID> ids;
 
-    @JsonUnwrapped
-    private final boolean allowNonProxied;
+  @JsonUnwrapped private final boolean allowNonProxied;
 
-    public ProxiedServeEventFilters() {
-        this(null, null, false);
+  public ProxiedServeEventFilters() {
+    this(null, null, false);
+  }
+
+  @JsonCreator
+  public ProxiedServeEventFilters(
+      @JsonProperty("filters") RequestPattern filters,
+      @JsonProperty("ids") List<UUID> ids,
+      @JsonProperty("allowNonProxied") boolean allowNonProxied) {
+    this.filters = filters;
+    this.ids = ids;
+    this.allowNonProxied = allowNonProxied;
+  }
+
+  @Override
+  public boolean apply(ServeEvent serveEvent) {
+    if (!serveEvent.getResponseDefinition().isProxyResponse() && !allowNonProxied) {
+      return false;
     }
 
-    @JsonCreator
-    public ProxiedServeEventFilters(
-        @JsonProperty("filters") RequestPattern filters,
-        @JsonProperty("ids") List<UUID> ids,
-        @JsonProperty("allowNonProxied") boolean allowNonProxied
-    ) {
-        this.filters = filters;
-        this.ids = ids;
-        this.allowNonProxied = allowNonProxied;
+    if (filters != null && !filters.match(serveEvent.getRequest()).isExactMatch()) {
+      return false;
     }
 
-    @Override
-    public boolean apply(ServeEvent serveEvent) {
-        if (!serveEvent.getResponseDefinition().isProxyResponse() && !allowNonProxied) {
-            return false;
-        }
-
-        if (filters != null && !filters.match(serveEvent.getRequest()).isExactMatch()) {
-            return false;
-        }
-
-        if (ids != null && !ids.contains(serveEvent.getId())) {
-            return false;
-        }
-
-        return true;
+    if (ids != null && !ids.contains(serveEvent.getId())) {
+      return false;
     }
+
+    return true;
+  }
 }

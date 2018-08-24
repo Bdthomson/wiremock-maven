@@ -15,27 +15,26 @@
  */
 package wiremock.admin.tasks;
 
+import java.util.UUID;
 import wiremock.admin.AdminTask;
 import wiremock.admin.model.PathParams;
 import wiremock.admin.model.SingleStubMappingResult;
 import wiremock.core.Admin;
 import wiremock.http.Request;
 import wiremock.http.ResponseDefinition;
-import java.util.UUID;
 
 public class RemoveStubMappingTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        SingleStubMappingResult stubMappingResult = admin.getStubMapping(
-            UUID.fromString(pathParams.get("id"))
-        );
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    SingleStubMappingResult stubMappingResult =
+        admin.getStubMapping(UUID.fromString(pathParams.get("id")));
 
-        if (!stubMappingResult.isPresent()) {
-            return ResponseDefinition.notFound();
-        }
-
-        admin.removeStubMapping(stubMappingResult.getItem());
-        return ResponseDefinition.okEmptyJson();
+    if (!stubMappingResult.isPresent()) {
+      return ResponseDefinition.notFound();
     }
+
+    admin.removeStubMapping(stubMappingResult.getItem());
+    return ResponseDefinition.okEmptyJson();
+  }
 }

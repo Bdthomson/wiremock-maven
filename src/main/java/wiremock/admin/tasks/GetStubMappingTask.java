@@ -15,24 +15,24 @@
  */
 package wiremock.admin.tasks;
 
+import java.util.UUID;
 import wiremock.admin.AdminTask;
 import wiremock.admin.model.PathParams;
 import wiremock.admin.model.SingleStubMappingResult;
 import wiremock.core.Admin;
 import wiremock.http.Request;
 import wiremock.http.ResponseDefinition;
-import java.util.UUID;
 
 public class GetStubMappingTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        String idString = pathParams.get("id");
-        UUID id = UUID.fromString(idString);
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    String idString = pathParams.get("id");
+    UUID id = UUID.fromString(idString);
 
-        SingleStubMappingResult stubMappingResult = admin.getStubMapping(id);
-        return stubMappingResult.isPresent() ?
-            ResponseDefinition.okForJson(stubMappingResult.getItem()) :
-            ResponseDefinition.notFound();
-    }
+    SingleStubMappingResult stubMappingResult = admin.getStubMapping(id);
+    return stubMappingResult.isPresent()
+        ? ResponseDefinition.okForJson(stubMappingResult.getItem())
+        : ResponseDefinition.notFound();
+  }
 }

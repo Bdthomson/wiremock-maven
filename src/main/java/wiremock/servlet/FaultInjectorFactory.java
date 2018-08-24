@@ -31,15 +31,14 @@
 
 package wiremock.servlet;
 
-import wiremock.core.FaultInjector;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import wiremock.core.FaultInjector;
 
 public interface FaultInjectorFactory {
 
-    String INJECTOR_CLASS_KEY = "FaultHandlerFactoryClass";
+  String INJECTOR_CLASS_KEY = "FaultHandlerFactoryClass";
 
-    FaultInjector buildFaultInjector(HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse);
-
+  FaultInjector buildFaultInjector(
+      HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse);
 }

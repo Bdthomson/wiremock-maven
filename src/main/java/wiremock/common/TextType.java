@@ -16,6 +16,7 @@
 package wiremock.common;
 
 public enum TextType {
-
-    JSON, XML, PLAIN_TEXT
+  JSON,
+  XML,
+  PLAIN_TEXT
 }

@@ -17,19 +17,19 @@ package wiremock.verification;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import wiremock.stubbing.ServeEvent;
 import java.util.List;
+import wiremock.stubbing.ServeEvent;
 
 public class FindServeEventsResult {
 
-    private final List<ServeEvent> serveEvents;
+  private final List<ServeEvent> serveEvents;
 
-    @JsonCreator
-    public FindServeEventsResult(@JsonProperty("serveEvents") List<ServeEvent> serveEvents) {
-        this.serveEvents = serveEvents;
-    }
+  @JsonCreator
+  public FindServeEventsResult(@JsonProperty("serveEvents") List<ServeEvent> serveEvents) {
+    this.serveEvents = serveEvents;
+  }
 
-    public List<ServeEvent> getServeEvents() {
-        return serveEvents;
-    }
+  public List<ServeEvent> getServeEvents() {
+    return serveEvents;
+  }
 }

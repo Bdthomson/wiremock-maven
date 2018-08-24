@@ -22,9 +22,9 @@ import wiremock.http.Request;
 import wiremock.http.ResponseDefinition;
 
 public class ResetScenariosTask implements AdminTask {
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        admin.resetScenarios();
-        return ResponseDefinition.okEmptyJson();
-    }
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    admin.resetScenarios();
+    return ResponseDefinition.okEmptyJson();
+  }
 }

@@ -31,21 +31,20 @@
 
 package wiremock.jetty9;
 
-import wiremock.core.FaultInjector;
-import wiremock.servlet.FaultInjectorFactory;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import wiremock.core.FaultInjector;
+import wiremock.servlet.FaultInjectorFactory;
 
 public class JettyFaultInjectorFactory implements FaultInjectorFactory {
 
-    @Override
-    public FaultInjector buildFaultInjector(HttpServletRequest httpServletRequest,
-            HttpServletResponse httpServletResponse) {
-        if (httpServletRequest.getScheme().equals("https")) {
-            return new JettyHttpsFaultInjector(httpServletResponse);
-        }
-
-        return new JettyFaultInjector(httpServletResponse);
+  @Override
+  public FaultInjector buildFaultInjector(
+      HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) {
+    if (httpServletRequest.getScheme().equals("https")) {
+      return new JettyHttpsFaultInjector(httpServletResponse);
     }
 
+    return new JettyFaultInjector(httpServletResponse);
+  }
 }

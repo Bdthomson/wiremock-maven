@@ -15,8 +15,8 @@
  */
 package wiremock.admin.tasks;
 
-import static wiremock.client.ResponseDefinitionBuilder.jsonResponse;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static wiremock.client.ResponseDefinitionBuilder.jsonResponse;
 
 import wiremock.admin.AdminTask;
 import wiremock.admin.model.PathParams;
@@ -29,13 +29,14 @@ import wiremock.recording.SnapshotRecordResult;
 
 public class SnapshotTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        RecordSpec recordSpec = request.getBody().length == 0
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    RecordSpec recordSpec =
+        request.getBody().length == 0
             ? RecordSpec.DEFAULTS
             : Json.read(request.getBodyAsString(), RecordSpec.class);
 
-        SnapshotRecordResult result = admin.snapshotRecord(recordSpec);
-        return jsonResponse(result, HTTP_OK);
-    }
+    SnapshotRecordResult result = admin.snapshotRecord(recordSpec);
+    return jsonResponse(result, HTTP_OK);
+  }
 }

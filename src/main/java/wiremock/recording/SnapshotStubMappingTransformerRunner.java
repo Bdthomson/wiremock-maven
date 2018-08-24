@@ -15,50 +15,49 @@
  */
 package wiremock.recording;
 
+import com.google.common.base.Function;
+import java.util.List;
 import wiremock.common.FileSource;
 import wiremock.extension.Parameters;
 import wiremock.extension.StubMappingTransformer;
 import wiremock.stubbing.StubMapping;
-import com.google.common.base.Function;
-import java.util.List;
 
 /**
  * Applies all registered StubMappingTransformer extensions against a stub mapping when applicable,
  * passing them any supplied Parameters.
  */
 public class SnapshotStubMappingTransformerRunner implements Function<StubMapping, StubMapping> {
-    private final FileSource filesRoot;
-    private final Parameters parameters;
-    private final Iterable<StubMappingTransformer> registeredTransformers;
-    private final List<String> requestedTransformers;
+  private final FileSource filesRoot;
+  private final Parameters parameters;
+  private final Iterable<StubMappingTransformer> registeredTransformers;
+  private final List<String> requestedTransformers;
 
-    public SnapshotStubMappingTransformerRunner(Iterable<StubMappingTransformer> registeredTransformers) {
-        this(registeredTransformers, null, null, null);
+  public SnapshotStubMappingTransformerRunner(
+      Iterable<StubMappingTransformer> registeredTransformers) {
+    this(registeredTransformers, null, null, null);
+  }
+
+  public SnapshotStubMappingTransformerRunner(
+      Iterable<StubMappingTransformer> registeredTransformers,
+      List<String> requestedTransformers,
+      Parameters parameters,
+      FileSource filesRoot) {
+    this.requestedTransformers = requestedTransformers;
+    this.registeredTransformers = registeredTransformers;
+    this.parameters = parameters;
+    this.filesRoot = filesRoot;
+  }
+
+  @Override
+  public StubMapping apply(StubMapping stubMapping) {
+    for (StubMappingTransformer transformer : registeredTransformers) {
+      if (transformer.applyGlobally()
+          || (requestedTransformers != null
+              && requestedTransformers.contains(transformer.getName()))) {
+        stubMapping = transformer.transform(stubMapping, filesRoot, parameters);
+      }
     }
 
-    public SnapshotStubMappingTransformerRunner(
-        Iterable<StubMappingTransformer> registeredTransformers,
-        List<String> requestedTransformers,
-        Parameters parameters,
-        FileSource filesRoot
-    ) {
-        this.requestedTransformers = requestedTransformers;
-        this.registeredTransformers = registeredTransformers;
-        this.parameters = parameters;
-        this.filesRoot = filesRoot;
-    }
-
-    @Override
-    public StubMapping apply(StubMapping stubMapping) {
-        for (StubMappingTransformer transformer : registeredTransformers) {
-            if (
-                transformer.applyGlobally()
-                || (requestedTransformers != null && requestedTransformers.contains(transformer.getName()))
-            ) {
-                stubMapping = transformer.transform(stubMapping, filesRoot, parameters);
-            }
-        }
-
-        return stubMapping;
-    }
+    return stubMapping;
+  }
 }

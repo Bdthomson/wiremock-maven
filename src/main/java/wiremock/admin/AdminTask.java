@@ -21,5 +21,5 @@ import wiremock.http.Request;
 import wiremock.http.ResponseDefinition;
 
 public interface AdminTask {
-    ResponseDefinition execute(Admin admin, Request request, PathParams pathParams);
+  ResponseDefinition execute(Admin admin, Request request, PathParams pathParams);
 }

@@ -15,9 +15,9 @@
  */
 package wiremock.admin;
 
-import static wiremock.client.ResponseDefinitionBuilder.jsonResponse;
 import static java.net.HttpURLConnection.HTTP_BAD_REQUEST;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static wiremock.client.ResponseDefinitionBuilder.jsonResponse;
 
 import wiremock.admin.model.PathParams;
 import wiremock.common.Errors;
@@ -29,13 +29,13 @@ import wiremock.recording.SnapshotRecordResult;
 
 public class StopRecordingTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        try {
-            SnapshotRecordResult result = admin.stopRecording();
-            return jsonResponse(result, HTTP_OK);
-        } catch (NotRecordingException e) {
-            return jsonResponse(Errors.notRecording(), HTTP_BAD_REQUEST);
-        }
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    try {
+      SnapshotRecordResult result = admin.stopRecording();
+      return jsonResponse(result, HTTP_OK);
+    } catch (NotRecordingException e) {
+      return jsonResponse(Errors.notRecording(), HTTP_BAD_REQUEST);
     }
+  }
 }

@@ -22,8 +22,8 @@ import wiremock.http.Request;
 import wiremock.http.ResponseDefinition;
 
 public class NotFoundAdminTask implements AdminTask {
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        return ResponseDefinition.notFound();
-    }
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    return ResponseDefinition.notFound();
+  }
 }

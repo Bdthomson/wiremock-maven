@@ -20,5 +20,5 @@ import wiremock.stubbing.ServeEvent;
 
 public interface StubServer {
 
-    ServeEvent serveStubFor(Request request);
+  ServeEvent serveStubFor(Request request);
 }

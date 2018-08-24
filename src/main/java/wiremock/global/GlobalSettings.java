@@ -15,50 +15,50 @@
  */
 package wiremock.global;
 
-import wiremock.http.DelayDistribution;
 import java.util.Objects;
+import wiremock.http.DelayDistribution;
 
 public class GlobalSettings {
 
-    private Integer fixedDelay;
-    private DelayDistribution delayDistribution;
+  private Integer fixedDelay;
+  private DelayDistribution delayDistribution;
 
-    public Integer getFixedDelay() {
-        return fixedDelay;
-    }
+  public Integer getFixedDelay() {
+    return fixedDelay;
+  }
 
-    public void setFixedDelay(Integer fixedDelay) {
-        this.fixedDelay = fixedDelay;
-    }
+  public void setFixedDelay(Integer fixedDelay) {
+    this.fixedDelay = fixedDelay;
+  }
 
-    public DelayDistribution getDelayDistribution() {
-        return delayDistribution;
-    }
+  public DelayDistribution getDelayDistribution() {
+    return delayDistribution;
+  }
 
-    public void setDelayDistribution(DelayDistribution distribution) {
-        delayDistribution = distribution;
-    }
+  public void setDelayDistribution(DelayDistribution distribution) {
+    delayDistribution = distribution;
+  }
 
-    public GlobalSettings copy() {
-        GlobalSettings newSettings = new GlobalSettings();
-        newSettings.setFixedDelay(fixedDelay);
-        newSettings.setDelayDistribution(delayDistribution);
-        return newSettings;
-    }
+  public GlobalSettings copy() {
+    GlobalSettings newSettings = new GlobalSettings();
+    newSettings.setFixedDelay(fixedDelay);
+    newSettings.setDelayDistribution(delayDistribution);
+    return newSettings;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
-        GlobalSettings that = (GlobalSettings) o;
+    GlobalSettings that = (GlobalSettings) o;
 
-        return Objects.equals(fixedDelay, that.fixedDelay)
-                && Objects.equals(delayDistribution, that.delayDistribution);
-    }
+    return Objects.equals(fixedDelay, that.fixedDelay)
+        && Objects.equals(delayDistribution, that.delayDistribution);
+  }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(fixedDelay, delayDistribution);
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(fixedDelay, delayDistribution);
+  }
 }

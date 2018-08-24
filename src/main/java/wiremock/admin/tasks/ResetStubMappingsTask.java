@@ -23,9 +23,9 @@ import wiremock.http.ResponseDefinition;
 
 public class ResetStubMappingsTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        admin.resetMappings();
-        return ResponseDefinition.okEmptyJson();
-    }
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    admin.resetMappings();
+    return ResponseDefinition.okEmptyJson();
+  }
 }

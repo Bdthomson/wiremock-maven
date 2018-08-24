@@ -19,44 +19,47 @@ import com.google.common.base.Function;
 
 public class CaseInsensitiveKey {
 
-    private final String key;
-    public CaseInsensitiveKey(String key) {
-        this.key = key;
-    }
+  private final String key;
 
-    public static CaseInsensitiveKey from(String key) {
-        return new CaseInsensitiveKey(key);
-    }
+  public CaseInsensitiveKey(String key) {
+    this.key = key;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+  public static CaseInsensitiveKey from(String key) {
+    return new CaseInsensitiveKey(key);
+  }
 
-        CaseInsensitiveKey that = (CaseInsensitiveKey) o;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
-        if (key != null ? !key.toLowerCase().equals(that.key.toLowerCase()) : that.key != null) return false;
+    CaseInsensitiveKey that = (CaseInsensitiveKey) o;
 
-        return true;
-    }
+    if (key != null ? !key.toLowerCase().equals(that.key.toLowerCase()) : that.key != null)
+      return false;
 
-    @Override
-    public int hashCode() {
-        return key != null ? key.toLowerCase().hashCode() : 0;
-    }
+    return true;
+  }
 
-    @Override
-    public String toString() {
-        return key;
-    }
+  @Override
+  public int hashCode() {
+    return key != null ? key.toLowerCase().hashCode() : 0;
+  }
 
-    public String value() {
-        return key;
-    }
+  @Override
+  public String toString() {
+    return key;
+  }
 
-    public static final Function<String, CaseInsensitiveKey> TO_CASE_INSENSITIVE_KEYS = new Function<String, CaseInsensitiveKey>() {
+  public String value() {
+    return key;
+  }
+
+  public static final Function<String, CaseInsensitiveKey> TO_CASE_INSENSITIVE_KEYS =
+      new Function<String, CaseInsensitiveKey>() {
         public CaseInsensitiveKey apply(String input) {
-            return from(input);
+          return from(input);
         }
-    };
+      };
 }

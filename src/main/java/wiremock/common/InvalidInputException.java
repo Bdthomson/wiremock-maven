@@ -17,7 +17,7 @@ package wiremock.common;
 
 public class InvalidInputException extends ClientError {
 
-    public InvalidInputException(Errors errors) {
-        super(errors);
-    }
+  public InvalidInputException(Errors errors) {
+    super(errors);
+  }
 }

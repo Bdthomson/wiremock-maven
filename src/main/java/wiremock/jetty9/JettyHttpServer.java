@@ -15,22 +15,10 @@
  */
 package wiremock.jetty9;
 
+import static java.util.concurrent.Executors.newScheduledThreadPool;
 import static wiremock.common.Exceptions.throwUnchecked;
 import static wiremock.core.WireMockApp.ADMIN_CONTEXT_ROOT;
-import static java.util.concurrent.Executors.newScheduledThreadPool;
 
-import wiremock.common.*;
-import wiremock.core.Options;
-import wiremock.core.WireMockApp;
-import wiremock.http.AdminRequestHandler;
-import wiremock.http.HttpServer;
-import wiremock.http.RequestHandler;
-import wiremock.http.StubRequestHandler;
-import wiremock.http.trafficlistener.WiremockNetworkTrafficListener;
-import wiremock.servlet.ContentTypeSettingFilter;
-import wiremock.servlet.FaultInjectorFactory;
-import wiremock.servlet.TrailingSlashFilter;
-import wiremock.servlet.WireMockHandlerDispatchingServlet;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
@@ -50,371 +38,382 @@ import org.eclipse.jetty.servlet.FilterHolder;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.CrossOriginFilter;
+import wiremock.common.*;
+import wiremock.core.Options;
+import wiremock.core.WireMockApp;
+import wiremock.http.AdminRequestHandler;
+import wiremock.http.HttpServer;
+import wiremock.http.RequestHandler;
+import wiremock.http.StubRequestHandler;
+import wiremock.http.trafficlistener.WiremockNetworkTrafficListener;
+import wiremock.servlet.ContentTypeSettingFilter;
+import wiremock.servlet.FaultInjectorFactory;
+import wiremock.servlet.TrailingSlashFilter;
+import wiremock.servlet.WireMockHandlerDispatchingServlet;
 
 public class JettyHttpServer implements HttpServer {
-    private static final String FILES_URL_MATCH = String.format("/%s/*", WireMockApp.FILES_ROOT);
+  private static final String FILES_URL_MATCH = String.format("/%s/*", WireMockApp.FILES_ROOT);
 
-    private final Server jettyServer;
-    private final ServerConnector httpConnector;
-    private final ServerConnector httpsConnector;
+  private final Server jettyServer;
+  private final ServerConnector httpConnector;
+  private final ServerConnector httpsConnector;
 
-    public JettyHttpServer(
-            Options options,
-            AdminRequestHandler adminRequestHandler,
-            StubRequestHandler stubRequestHandler
-    ) {
-        jettyServer = createServer(options);
+  public JettyHttpServer(
+      Options options,
+      AdminRequestHandler adminRequestHandler,
+      StubRequestHandler stubRequestHandler) {
+    jettyServer = createServer(options);
 
-        NetworkTrafficListenerAdapter networkTrafficListenerAdapter = new NetworkTrafficListenerAdapter(options.networkTrafficListener());
-        httpConnector = createHttpConnector(
-                options.bindAddress(),
-                options.portNumber(),
-                options.jettySettings(),
-                networkTrafficListenerAdapter
-        );
-        jettyServer.addConnector(httpConnector);
+    NetworkTrafficListenerAdapter networkTrafficListenerAdapter =
+        new NetworkTrafficListenerAdapter(options.networkTrafficListener());
+    httpConnector =
+        createHttpConnector(
+            options.bindAddress(),
+            options.portNumber(),
+            options.jettySettings(),
+            networkTrafficListenerAdapter);
+    jettyServer.addConnector(httpConnector);
 
-        if (options.httpsSettings().enabled()) {
-            httpsConnector = createHttpsConnector(
-                    options.bindAddress(),
-                    options.httpsSettings(),
-                    options.jettySettings(),
-                    networkTrafficListenerAdapter);
-            jettyServer.addConnector(httpsConnector);
-        } else {
-            httpsConnector = null;
-        }
-
-        jettyServer.setHandler(createHandler(options, adminRequestHandler, stubRequestHandler));
-
-        finalizeSetup(options);
+    if (options.httpsSettings().enabled()) {
+      httpsConnector =
+          createHttpsConnector(
+              options.bindAddress(),
+              options.httpsSettings(),
+              options.jettySettings(),
+              networkTrafficListenerAdapter);
+      jettyServer.addConnector(httpsConnector);
+    } else {
+      httpsConnector = null;
     }
 
-    protected HandlerCollection createHandler(Options options, AdminRequestHandler adminRequestHandler, StubRequestHandler stubRequestHandler) {
-        Notifier notifier = options.notifier();
-        ServletContextHandler adminContext = addAdminContext(
-                adminRequestHandler,
-                notifier
-        );
-        ServletContextHandler mockServiceContext = addMockServiceContext(
-                stubRequestHandler,
-                options.filesRoot(),
-                options.getAsynchronousResponseSettings(),
-                notifier
-        );
+    jettyServer.setHandler(createHandler(options, adminRequestHandler, stubRequestHandler));
 
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers(ArrayUtils.addAll(extensionHandlers(), adminContext));
+    finalizeSetup(options);
+  }
 
-        addGZipHandler(mockServiceContext, handlers);
+  protected HandlerCollection createHandler(
+      Options options,
+      AdminRequestHandler adminRequestHandler,
+      StubRequestHandler stubRequestHandler) {
+    Notifier notifier = options.notifier();
+    ServletContextHandler adminContext = addAdminContext(adminRequestHandler, notifier);
+    ServletContextHandler mockServiceContext =
+        addMockServiceContext(
+            stubRequestHandler,
+            options.filesRoot(),
+            options.getAsynchronousResponseSettings(),
+            notifier);
 
-        return handlers;
+    HandlerCollection handlers = new HandlerCollection();
+    handlers.setHandlers(ArrayUtils.addAll(extensionHandlers(), adminContext));
+
+    addGZipHandler(mockServiceContext, handlers);
+
+    return handlers;
+  }
+
+  private void addGZipHandler(
+      ServletContextHandler mockServiceContext, HandlerCollection handlers) {
+    Class<?> gzipHandlerClass = null;
+
+    try {
+      gzipHandlerClass = Class.forName("org.eclipse.jetty.servlets.gzip.GzipHandler");
+    } catch (ClassNotFoundException e) {
+      try {
+        gzipHandlerClass = Class.forName("org.eclipse.jetty.server.handler.gzip.GzipHandler");
+      } catch (ClassNotFoundException e1) {
+        throwUnchecked(e1);
+      }
     }
 
-    private void addGZipHandler(ServletContextHandler mockServiceContext, HandlerCollection handlers) {
-        Class<?> gzipHandlerClass = null;
+    try {
+      HandlerWrapper gzipWrapper = (HandlerWrapper) gzipHandlerClass.newInstance();
+      gzipWrapper.setHandler(mockServiceContext);
+      handlers.addHandler(gzipWrapper);
+    } catch (Exception e) {
+      throwUnchecked(e);
+    }
+  }
 
-        try {
-            gzipHandlerClass = Class.forName("org.eclipse.jetty.servlets.gzip.GzipHandler");
-        } catch (ClassNotFoundException e) {
-            try {
-                gzipHandlerClass = Class.forName("org.eclipse.jetty.server.handler.gzip.GzipHandler");
-            } catch (ClassNotFoundException e1) {
-                throwUnchecked(e1);
-            }
-        }
+  protected void finalizeSetup(Options options) {
+    if (!options.jettySettings().getStopTimeout().isPresent()) {
+      jettyServer.setStopTimeout(0);
+    }
+  }
 
-        try {
-            HandlerWrapper gzipWrapper = (HandlerWrapper) gzipHandlerClass.newInstance();
-            gzipWrapper.setHandler(mockServiceContext);
-            handlers.addHandler(gzipWrapper);
-        } catch (Exception e) {
-            throwUnchecked(e);
-        }
+  protected Server createServer(Options options) {
+    final Server server = new Server(options.threadPoolFactory().buildThreadPool(options));
+    final JettySettings jettySettings = options.jettySettings();
+    final Optional<Long> stopTimeout = jettySettings.getStopTimeout();
+    if (stopTimeout.isPresent()) {
+      server.setStopTimeout(stopTimeout.get());
+    }
+    return server;
+  }
+
+  /** Extend only this method if you want to add additional handlers to Jetty. */
+  protected Handler[] extensionHandlers() {
+    return new Handler[] {};
+  }
+
+  @Override
+  public void start() {
+    try {
+      jettyServer.start();
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+    long timeout = System.currentTimeMillis() + 30000;
+    while (!jettyServer.isStarted()) {
+      try {
+        Thread.sleep(100);
+      } catch (InterruptedException e) {
+        // no-op
+      }
+      if (System.currentTimeMillis() > timeout) {
+        throw new RuntimeException("Server took too long to start up.");
+      }
+    }
+  }
+
+  @Override
+  public void stop() {
+    try {
+      jettyServer.stop();
+      jettyServer.join();
+    } catch (Exception e) {
+      throwUnchecked(e);
+    }
+  }
+
+  @Override
+  public boolean isRunning() {
+    return jettyServer.isRunning();
+  }
+
+  @Override
+  public int port() {
+    return httpConnector.getLocalPort();
+  }
+
+  @Override
+  public int httpsPort() {
+    return httpsConnector.getLocalPort();
+  }
+
+  protected long stopTimeout() {
+    return jettyServer.getStopTimeout();
+  }
+
+  protected ServerConnector createHttpConnector(
+      String bindAddress, int port, JettySettings jettySettings, NetworkTrafficListener listener) {
+
+    HttpConfiguration httpConfig = createHttpConfig(jettySettings);
+
+    ServerConnector connector =
+        createServerConnector(
+            bindAddress, jettySettings, port, listener, new HttpConnectionFactory(httpConfig));
+
+    return connector;
+  }
+
+  protected ServerConnector createHttpsConnector(
+      String bindAddress,
+      HttpsSettings httpsSettings,
+      JettySettings jettySettings,
+      NetworkTrafficListener listener) {
+
+    // Added to support Android https communication.
+    CustomizedSslContextFactory sslContextFactory = new CustomizedSslContextFactory();
+
+    sslContextFactory.setKeyStorePath(httpsSettings.keyStorePath());
+    sslContextFactory.setKeyManagerPassword(httpsSettings.keyStorePassword());
+    sslContextFactory.setKeyStoreType(httpsSettings.keyStoreType());
+    if (httpsSettings.hasTrustStore()) {
+      sslContextFactory.setTrustStorePath(httpsSettings.trustStorePath());
+      sslContextFactory.setTrustStorePassword(httpsSettings.trustStorePassword());
+      sslContextFactory.setTrustStoreType(httpsSettings.trustStoreType());
+    }
+    sslContextFactory.setNeedClientAuth(httpsSettings.needClientAuth());
+
+    HttpConfiguration httpConfig = createHttpConfig(jettySettings);
+    httpConfig.addCustomizer(new SecureRequestCustomizer());
+
+    final int port = httpsSettings.port();
+
+    return createServerConnector(
+        bindAddress,
+        jettySettings,
+        port,
+        listener,
+        new SslConnectionFactory(sslContextFactory, "http/1.1"),
+        new HttpConnectionFactory(httpConfig));
+  }
+
+  protected HttpConfiguration createHttpConfig(JettySettings jettySettings) {
+    HttpConfiguration httpConfig = new HttpConfiguration();
+    httpConfig.setRequestHeaderSize(jettySettings.getRequestHeaderSize().or(8192));
+    httpConfig.setSendDateHeader(false);
+    return httpConfig;
+  }
+
+  protected ServerConnector createServerConnector(
+      String bindAddress,
+      JettySettings jettySettings,
+      int port,
+      NetworkTrafficListener listener,
+      ConnectionFactory... connectionFactories) {
+    int acceptors = jettySettings.getAcceptors().or(2);
+    NetworkTrafficServerConnector connector =
+        new NetworkTrafficServerConnector(
+            jettyServer, null, null, null, acceptors, 2, connectionFactories);
+    connector.setPort(port);
+
+    connector.setStopTimeout(0);
+    connector.getSelectorManager().setStopTimeout(0);
+
+    connector.addNetworkTrafficListener(listener);
+
+    setJettySettings(jettySettings, connector);
+
+    connector.setHost(bindAddress);
+
+    return connector;
+  }
+
+  private void setJettySettings(JettySettings jettySettings, ServerConnector connector) {
+    if (jettySettings.getAcceptQueueSize().isPresent()) {
+      connector.setAcceptQueueSize(jettySettings.getAcceptQueueSize().get());
+    }
+  }
+
+  @SuppressWarnings({"rawtypes", "unchecked"})
+  private ServletContextHandler addMockServiceContext(
+      StubRequestHandler stubRequestHandler,
+      FileSource fileSource,
+      AsynchronousResponseSettings asynchronousResponseSettings,
+      Notifier notifier) {
+    ServletContextHandler mockServiceContext = new ServletContextHandler(jettyServer, "/");
+
+    mockServiceContext.setInitParameter("org.eclipse.jetty.servlet.Default.maxCacheSize", "0");
+    mockServiceContext.setInitParameter(
+        "org.eclipse.jetty.servlet.Default.resourceBase", fileSource.getPath());
+    mockServiceContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+
+    mockServiceContext.addServlet(DefaultServlet.class, FILES_URL_MATCH);
+
+    mockServiceContext.setAttribute(
+        JettyFaultInjectorFactory.class.getName(), new JettyFaultInjectorFactory());
+    mockServiceContext.setAttribute(StubRequestHandler.class.getName(), stubRequestHandler);
+    mockServiceContext.setAttribute(Notifier.KEY, notifier);
+    ServletHolder servletHolder =
+        mockServiceContext.addServlet(WireMockHandlerDispatchingServlet.class, "/");
+    servletHolder.setInitParameter(
+        RequestHandler.HANDLER_CLASS_KEY, StubRequestHandler.class.getName());
+    servletHolder.setInitParameter(
+        FaultInjectorFactory.INJECTOR_CLASS_KEY, JettyFaultInjectorFactory.class.getName());
+    servletHolder.setInitParameter(
+        WireMockHandlerDispatchingServlet.SHOULD_FORWARD_TO_FILES_CONTEXT, "true");
+
+    if (asynchronousResponseSettings.isEnabled()) {
+      ScheduledExecutorService scheduledExecutorService =
+          newScheduledThreadPool(asynchronousResponseSettings.getThreads());
+      mockServiceContext.setAttribute(
+          WireMockHandlerDispatchingServlet.ASYNCHRONOUS_RESPONSE_EXECUTOR,
+          scheduledExecutorService);
     }
 
-    protected void finalizeSetup(Options options) {
-        if(!options.jettySettings().getStopTimeout().isPresent()) {
-            jettyServer.setStopTimeout(0);
-        }
+    MimeTypes mimeTypes = new MimeTypes();
+    mimeTypes.addMimeMapping("json", "application/json");
+    mimeTypes.addMimeMapping("html", "text/html");
+    mimeTypes.addMimeMapping("xml", "application/xml");
+    mimeTypes.addMimeMapping("txt", "text/plain");
+    mockServiceContext.setMimeTypes(mimeTypes);
+    mockServiceContext.setWelcomeFiles(
+        new String[] {"index.json", "index.html", "index.xml", "index.txt"});
+
+    mockServiceContext.setErrorHandler(new NotFoundHandler());
+
+    mockServiceContext.addFilter(
+        ContentTypeSettingFilter.class, FILES_URL_MATCH, EnumSet.of(DispatcherType.FORWARD));
+    mockServiceContext.addFilter(
+        TrailingSlashFilter.class, FILES_URL_MATCH, EnumSet.allOf(DispatcherType.class));
+
+    return mockServiceContext;
+  }
+
+  private ServletContextHandler addAdminContext(
+      AdminRequestHandler adminRequestHandler, Notifier notifier) {
+    ServletContextHandler adminContext = new ServletContextHandler(jettyServer, ADMIN_CONTEXT_ROOT);
+
+    adminContext.setInitParameter("org.eclipse.jetty.servlet.Default.maxCacheSize", "0");
+
+    String javaVendor = System.getProperty("java.vendor");
+    if (javaVendor != null && javaVendor.toLowerCase().contains("android")) {
+      // Special case for Android, fixes IllegalArgumentException("resource assets not found."):
+      //  The Android ClassLoader apparently does not resolve directories.
+      //  Furthermore, lib assets will be merged into a single asset directory when a jar file is
+      // assimilated into an apk.
+      //  As resources can be addressed like "assets/swagger-ui/index.html", a static path element
+      // will suffice.
+      adminContext.setInitParameter("org.eclipse.jetty.servlet.Default.resourceBase", "assets");
+    } else {
+      adminContext.setInitParameter(
+          "org.eclipse.jetty.servlet.Default.resourceBase",
+          Resources.getResource("assets").toString());
     }
 
-    protected Server createServer(Options options) {
-        final Server server = new Server(options.threadPoolFactory().buildThreadPool(options));
-        final JettySettings jettySettings = options.jettySettings();
-        final Optional<Long> stopTimeout = jettySettings.getStopTimeout();
-        if(stopTimeout.isPresent()) {
-            server.setStopTimeout(stopTimeout.get());
-        }
-        return server;
-    }
+    Resources.getResource("assets/swagger-ui/index.html");
 
-    /**
-     * Extend only this method if you want to add additional handlers to Jetty.
-     */
-    protected Handler[] extensionHandlers() {
-        return new Handler[]{};
-    }
+    adminContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+    adminContext.addServlet(DefaultServlet.class, "/swagger-ui/*");
+    adminContext.addServlet(DefaultServlet.class, "/recorder/*");
 
-    @Override
-    public void start() {
-        try {
-            jettyServer.start();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-        long timeout = System.currentTimeMillis() + 30000;
-        while (!jettyServer.isStarted()) {
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException e) {
-                // no-op
-            }
-            if (System.currentTimeMillis() > timeout) {
-                throw new RuntimeException("Server took too long to start up.");
-            }
-        }
-    }
+    ServletHolder servletHolder =
+        adminContext.addServlet(WireMockHandlerDispatchingServlet.class, "/");
+    servletHolder.setInitParameter(
+        RequestHandler.HANDLER_CLASS_KEY, AdminRequestHandler.class.getName());
+    adminContext.setAttribute(AdminRequestHandler.class.getName(), adminRequestHandler);
+    adminContext.setAttribute(Notifier.KEY, notifier);
 
-    @Override
-    public void stop() {
-        try {
-            jettyServer.stop();
-            jettyServer.join();
-        } catch (Exception e) {
-            throwUnchecked(e);
-        }
-    }
-
-    @Override
-    public boolean isRunning() {
-        return jettyServer.isRunning();
-    }
-
-    @Override
-    public int port() {
-        return httpConnector.getLocalPort();
-    }
-
-    @Override
-    public int httpsPort() {
-        return httpsConnector.getLocalPort();
-    }
-
-    protected long stopTimeout() {
-        return jettyServer.getStopTimeout();
-    }
-
-    protected ServerConnector createHttpConnector(
-            String bindAddress,
-            int port,
-            JettySettings jettySettings,
-            NetworkTrafficListener listener) {
-
-        HttpConfiguration httpConfig = createHttpConfig(jettySettings);
-
-        ServerConnector connector = createServerConnector(
-                bindAddress,
-                jettySettings,
-                port,
-                listener,
-                new HttpConnectionFactory(httpConfig)
-        );
-
-        return connector;
-    }
-
-    protected ServerConnector createHttpsConnector(
-            String bindAddress,
-            HttpsSettings httpsSettings,
-            JettySettings jettySettings,
-            NetworkTrafficListener listener) {
-
-        //Added to support Android https communication.
-        CustomizedSslContextFactory sslContextFactory = new CustomizedSslContextFactory();
-
-        sslContextFactory.setKeyStorePath(httpsSettings.keyStorePath());
-        sslContextFactory.setKeyManagerPassword(httpsSettings.keyStorePassword());
-        sslContextFactory.setKeyStoreType(httpsSettings.keyStoreType());
-        if (httpsSettings.hasTrustStore()) {
-            sslContextFactory.setTrustStorePath(httpsSettings.trustStorePath());
-            sslContextFactory.setTrustStorePassword(httpsSettings.trustStorePassword());
-            sslContextFactory.setTrustStoreType(httpsSettings.trustStoreType());
-        }
-        sslContextFactory.setNeedClientAuth(httpsSettings.needClientAuth());
-
-        HttpConfiguration httpConfig = createHttpConfig(jettySettings);
-        httpConfig.addCustomizer(new SecureRequestCustomizer());
-
-        final int port = httpsSettings.port();
-
-        return createServerConnector(
-                bindAddress,
-                jettySettings,
-                port,
-                listener,
-                new SslConnectionFactory(
-                        sslContextFactory,
-                        "http/1.1"
-                ),
-                new HttpConnectionFactory(httpConfig)
-        );
-    }
-
-    protected HttpConfiguration createHttpConfig(JettySettings jettySettings) {
-        HttpConfiguration httpConfig = new HttpConfiguration();
-        httpConfig.setRequestHeaderSize(
-                jettySettings.getRequestHeaderSize().or(8192)
-        );
-        httpConfig.setSendDateHeader(false);
-        return httpConfig;
-    }
-
-    protected ServerConnector createServerConnector(String bindAddress,
-                                                  JettySettings jettySettings,
-                                                  int port, NetworkTrafficListener listener,
-                                                  ConnectionFactory... connectionFactories) {
-        int acceptors = jettySettings.getAcceptors().or(2);
-        NetworkTrafficServerConnector connector = new NetworkTrafficServerConnector(
-                jettyServer,
-                null,
-                null,
-                null,
-                acceptors,
-                2,
-                connectionFactories
-        );
-        connector.setPort(port);
-
-        connector.setStopTimeout(0);
-        connector.getSelectorManager().setStopTimeout(0);
-
-        connector.addNetworkTrafficListener(listener);
-
-        setJettySettings(jettySettings, connector);
-
-        connector.setHost(bindAddress);
-
-        return connector;
-    }
-
-    private void setJettySettings(JettySettings jettySettings, ServerConnector connector) {
-        if (jettySettings.getAcceptQueueSize().isPresent()) {
-            connector.setAcceptQueueSize(jettySettings.getAcceptQueueSize().get());
-        }
-    }
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private ServletContextHandler addMockServiceContext(
-            StubRequestHandler stubRequestHandler,
-            FileSource fileSource,
-            AsynchronousResponseSettings asynchronousResponseSettings,
-            Notifier notifier
-    ) {
-        ServletContextHandler mockServiceContext = new ServletContextHandler(jettyServer, "/");
-
-        mockServiceContext.setInitParameter("org.eclipse.jetty.servlet.Default.maxCacheSize", "0");
-        mockServiceContext.setInitParameter("org.eclipse.jetty.servlet.Default.resourceBase", fileSource.getPath());
-        mockServiceContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
-
-        mockServiceContext.addServlet(DefaultServlet.class, FILES_URL_MATCH);
-
-        mockServiceContext.setAttribute(JettyFaultInjectorFactory.class.getName(), new JettyFaultInjectorFactory());
-        mockServiceContext.setAttribute(StubRequestHandler.class.getName(), stubRequestHandler);
-        mockServiceContext.setAttribute(Notifier.KEY, notifier);
-        ServletHolder servletHolder = mockServiceContext.addServlet(WireMockHandlerDispatchingServlet.class, "/");
-        servletHolder.setInitParameter(RequestHandler.HANDLER_CLASS_KEY, StubRequestHandler.class.getName());
-        servletHolder.setInitParameter(FaultInjectorFactory.INJECTOR_CLASS_KEY, JettyFaultInjectorFactory.class.getName());
-        servletHolder.setInitParameter(WireMockHandlerDispatchingServlet.SHOULD_FORWARD_TO_FILES_CONTEXT, "true");
-
-        if (asynchronousResponseSettings.isEnabled()) {
-            ScheduledExecutorService scheduledExecutorService = newScheduledThreadPool(asynchronousResponseSettings.getThreads());
-            mockServiceContext.setAttribute(WireMockHandlerDispatchingServlet.ASYNCHRONOUS_RESPONSE_EXECUTOR, scheduledExecutorService);
-        }
-
-        MimeTypes mimeTypes = new MimeTypes();
-        mimeTypes.addMimeMapping("json", "application/json");
-        mimeTypes.addMimeMapping("html", "text/html");
-        mimeTypes.addMimeMapping("xml", "application/xml");
-        mimeTypes.addMimeMapping("txt", "text/plain");
-        mockServiceContext.setMimeTypes(mimeTypes);
-        mockServiceContext.setWelcomeFiles(new String[]{"index.json", "index.html", "index.xml", "index.txt"});
-
-        mockServiceContext.setErrorHandler(new NotFoundHandler());
-
-        mockServiceContext.addFilter(ContentTypeSettingFilter.class, FILES_URL_MATCH, EnumSet.of(DispatcherType.FORWARD));
-        mockServiceContext.addFilter(TrailingSlashFilter.class, FILES_URL_MATCH, EnumSet.allOf(DispatcherType.class));
-
-        return mockServiceContext;
-    }
-
-    private ServletContextHandler addAdminContext(
-            AdminRequestHandler adminRequestHandler,
-            Notifier notifier
-    ) {
-        ServletContextHandler adminContext = new ServletContextHandler(jettyServer, ADMIN_CONTEXT_ROOT);
-
-        adminContext.setInitParameter("org.eclipse.jetty.servlet.Default.maxCacheSize", "0");
-
-        String javaVendor = System.getProperty("java.vendor");
-        if (javaVendor != null && javaVendor.toLowerCase().contains("android")) {
-            //Special case for Android, fixes IllegalArgumentException("resource assets not found."):
-            //  The Android ClassLoader apparently does not resolve directories.
-            //  Furthermore, lib assets will be merged into a single asset directory when a jar file is assimilated into an apk.
-            //  As resources can be addressed like "assets/swagger-ui/index.html", a static path element will suffice.
-            adminContext.setInitParameter("org.eclipse.jetty.servlet.Default.resourceBase", "assets");
-        } else {
-            adminContext.setInitParameter("org.eclipse.jetty.servlet.Default.resourceBase", Resources.getResource("assets").toString());
-        }
-
-        Resources.getResource("assets/swagger-ui/index.html");
-
-        adminContext.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
-        adminContext.addServlet(DefaultServlet.class, "/swagger-ui/*");
-        adminContext.addServlet(DefaultServlet.class, "/recorder/*");
-
-        ServletHolder servletHolder = adminContext.addServlet(WireMockHandlerDispatchingServlet.class, "/");
-        servletHolder.setInitParameter(RequestHandler.HANDLER_CLASS_KEY, AdminRequestHandler.class.getName());
-        adminContext.setAttribute(AdminRequestHandler.class.getName(), adminRequestHandler);
-        adminContext.setAttribute(Notifier.KEY, notifier);
-
-        FilterHolder filterHolder = new FilterHolder(CrossOriginFilter.class);
-        filterHolder.setInitParameters(ImmutableMap.of(
+    FilterHolder filterHolder = new FilterHolder(CrossOriginFilter.class);
+    filterHolder.setInitParameters(
+        ImmutableMap.of(
             "chainPreflight", "false",
             "allowedOrigins", "*",
             "allowedHeaders", "X-Requested-With,Content-Type,Accept,Origin,Authorization",
             "allowedMethods", "OPTIONS,GET,POST,PUT,PATCH,DELETE"));
 
-        adminContext.addFilter(filterHolder, "/*", EnumSet.of(DispatcherType.REQUEST));
+    adminContext.addFilter(filterHolder, "/*", EnumSet.of(DispatcherType.REQUEST));
 
-        return adminContext;
+    return adminContext;
+  }
+
+  private static class NetworkTrafficListenerAdapter implements NetworkTrafficListener {
+    private final WiremockNetworkTrafficListener wiremockNetworkTrafficListener;
+
+    NetworkTrafficListenerAdapter(WiremockNetworkTrafficListener wiremockNetworkTrafficListener) {
+      this.wiremockNetworkTrafficListener = wiremockNetworkTrafficListener;
     }
 
-    private static class NetworkTrafficListenerAdapter implements NetworkTrafficListener {
-        private final WiremockNetworkTrafficListener wiremockNetworkTrafficListener;
-
-        NetworkTrafficListenerAdapter(WiremockNetworkTrafficListener wiremockNetworkTrafficListener) {
-            this.wiremockNetworkTrafficListener = wiremockNetworkTrafficListener;
-        }
-
-        @Override
-        public void opened(Socket socket) {
-            wiremockNetworkTrafficListener.opened(socket);
-        }
-
-        @Override
-        public void incoming(Socket socket, ByteBuffer bytes) {
-            wiremockNetworkTrafficListener.incoming(socket, bytes);
-        }
-
-        @Override
-        public void outgoing(Socket socket, ByteBuffer bytes) {
-            wiremockNetworkTrafficListener.outgoing(socket, bytes);
-        }
-
-        @Override
-        public void closed(Socket socket) {
-            wiremockNetworkTrafficListener.closed(socket);
-        }
+    @Override
+    public void opened(Socket socket) {
+      wiremockNetworkTrafficListener.opened(socket);
     }
+
+    @Override
+    public void incoming(Socket socket, ByteBuffer bytes) {
+      wiremockNetworkTrafficListener.incoming(socket, bytes);
+    }
+
+    @Override
+    public void outgoing(Socket socket, ByteBuffer bytes) {
+      wiremockNetworkTrafficListener.outgoing(socket, bytes);
+    }
+
+    @Override
+    public void closed(Socket socket) {
+      wiremockNetworkTrafficListener.closed(socket);
+    }
+  }
 }

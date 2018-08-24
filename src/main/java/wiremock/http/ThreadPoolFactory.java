@@ -15,10 +15,10 @@
  */
 package wiremock.http;
 
-import wiremock.core.Options;
 import org.eclipse.jetty.util.thread.ThreadPool;
+import wiremock.core.Options;
 
 public interface ThreadPoolFactory {
 
-    ThreadPool buildThreadPool(Options options);
+  ThreadPool buildThreadPool(Options options);
 }

@@ -15,6 +15,9 @@
  */
 package wiremock.core;
 
+import com.google.common.base.Optional;
+import java.util.List;
+import java.util.Map;
 import wiremock.common.AsynchronousResponseSettings;
 import wiremock.common.FileSource;
 import wiremock.common.HttpsSettings;
@@ -29,39 +32,59 @@ import wiremock.http.trafficlistener.WiremockNetworkTrafficListener;
 import wiremock.security.Authenticator;
 import wiremock.standalone.MappingsLoader;
 import wiremock.verification.notmatched.NotMatchedRenderer;
-import com.google.common.base.Optional;
-import java.util.List;
-import java.util.Map;
 
 public interface Options {
 
-    int DEFAULT_PORT = 8080;
-    int DYNAMIC_PORT = 0;
-    int DEFAULT_CONTAINER_THREADS = 10;
-    String DEFAULT_BIND_ADDRESS = "0.0.0.0";
+  int DEFAULT_PORT = 8080;
+  int DYNAMIC_PORT = 0;
+  int DEFAULT_CONTAINER_THREADS = 10;
+  String DEFAULT_BIND_ADDRESS = "0.0.0.0";
 
-    int portNumber();
-    HttpsSettings httpsSettings();
-    JettySettings jettySettings();
-    int containerThreads();
-    boolean browserProxyingEnabled();
-    ProxySettings proxyVia();
-    FileSource filesRoot();
-    MappingsLoader mappingsLoader();
-    MappingsSaver mappingsSaver();
-    Notifier notifier();
-    boolean requestJournalDisabled();
-    Optional<Integer> maxRequestJournalEntries();
-    String bindAddress();
-    List<CaseInsensitiveKey> matchingHeaders();
-    boolean shouldPreserveHostHeader();
-    String proxyHostHeader();
-    HttpServerFactory httpServerFactory();
-    ThreadPoolFactory threadPoolFactory();
-    <T extends Extension> Map<String, T> extensionsOfType(Class<T> extensionType);
-    WiremockNetworkTrafficListener networkTrafficListener();
-    Authenticator getAdminAuthenticator();
-    boolean getHttpsRequiredForAdminApi();
-    NotMatchedRenderer getNotMatchedRenderer();
-    AsynchronousResponseSettings getAsynchronousResponseSettings();
+  int portNumber();
+
+  HttpsSettings httpsSettings();
+
+  JettySettings jettySettings();
+
+  int containerThreads();
+
+  boolean browserProxyingEnabled();
+
+  ProxySettings proxyVia();
+
+  FileSource filesRoot();
+
+  MappingsLoader mappingsLoader();
+
+  MappingsSaver mappingsSaver();
+
+  Notifier notifier();
+
+  boolean requestJournalDisabled();
+
+  Optional<Integer> maxRequestJournalEntries();
+
+  String bindAddress();
+
+  List<CaseInsensitiveKey> matchingHeaders();
+
+  boolean shouldPreserveHostHeader();
+
+  String proxyHostHeader();
+
+  HttpServerFactory httpServerFactory();
+
+  ThreadPoolFactory threadPoolFactory();
+
+  <T extends Extension> Map<String, T> extensionsOfType(Class<T> extensionType);
+
+  WiremockNetworkTrafficListener networkTrafficListener();
+
+  Authenticator getAdminAuthenticator();
+
+  boolean getHttpsRequiredForAdminApi();
+
+  NotMatchedRenderer getNotMatchedRenderer();
+
+  AsynchronousResponseSettings getAsynchronousResponseSettings();
 }

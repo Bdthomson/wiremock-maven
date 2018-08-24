@@ -16,7 +16,7 @@
 package wiremock.recording;
 
 public enum RecordingStatus {
-
-    NeverStarted, Recording, Stopped
-
+  NeverStarted,
+  Recording,
+  Stopped
 }

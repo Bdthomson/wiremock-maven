@@ -15,10 +15,10 @@
  */
 package wiremock.security;
 
-import wiremock.http.HttpHeader;
 import java.util.List;
+import wiremock.http.HttpHeader;
 
 public interface ClientAuthenticator {
 
-    List<HttpHeader> generateAuthHeaders();
+  List<HttpHeader> generateAuthHeaders();
 }

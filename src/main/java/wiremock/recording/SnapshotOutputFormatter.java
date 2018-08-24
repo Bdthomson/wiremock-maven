@@ -16,36 +16,34 @@
 package wiremock.recording;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import wiremock.stubbing.StubMapping;
 import java.util.List;
+import wiremock.stubbing.StubMapping;
 
-/**
- * Wraps a list of generated StubMappings into a SnapshotRecordResult object
- */
+/** Wraps a list of generated StubMappings into a SnapshotRecordResult object */
 public enum SnapshotOutputFormatter {
-    FULL {
-        @Override
-        public SnapshotRecordResult format(List<StubMapping> stubMappings) {
-            return SnapshotRecordResult.full(stubMappings);
-        }
-    },
-    IDS {
-        @Override
-        public SnapshotRecordResult format(List<StubMapping> stubMappings) {
-            return SnapshotRecordResult.idsFromMappings(stubMappings);
-        }
-    };
-
-    public abstract SnapshotRecordResult format(List<StubMapping> stubMappings);
-
-    @JsonCreator
-    public static SnapshotOutputFormatter fromString(String value) {
-        if (value == null || value.equalsIgnoreCase("full")) {
-            return FULL;
-        } else if (value.equalsIgnoreCase("ids")) {
-            return IDS;
-        } else {
-            throw new IllegalArgumentException("Invalid output format");
-        }
+  FULL {
+    @Override
+    public SnapshotRecordResult format(List<StubMapping> stubMappings) {
+      return SnapshotRecordResult.full(stubMappings);
     }
+  },
+  IDS {
+    @Override
+    public SnapshotRecordResult format(List<StubMapping> stubMappings) {
+      return SnapshotRecordResult.idsFromMappings(stubMappings);
+    }
+  };
+
+  public abstract SnapshotRecordResult format(List<StubMapping> stubMappings);
+
+  @JsonCreator
+  public static SnapshotOutputFormatter fromString(String value) {
+    if (value == null || value.equalsIgnoreCase("full")) {
+      return FULL;
+    } else if (value.equalsIgnoreCase("ids")) {
+      return IDS;
+    } else {
+      throw new IllegalArgumentException("Invalid output format");
+    }
+  }
 }

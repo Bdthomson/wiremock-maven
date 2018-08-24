@@ -16,9 +16,8 @@
 package wiremock.http;
 
 public interface ResponseRenderer {
-	
-	public static final String CONTEXT_KEY = "ResponseRenderer";
 
-	Response render(ResponseDefinition responseDefinition);
-	
+  public static final String CONTEXT_KEY = "ResponseRenderer";
+
+  Response render(ResponseDefinition responseDefinition);
 }

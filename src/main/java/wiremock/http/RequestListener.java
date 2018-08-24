@@ -17,5 +17,5 @@ package wiremock.http;
 
 public interface RequestListener {
 
-	void requestReceived(Request request, Response response);
+  void requestReceived(Request request, Response response);
 }

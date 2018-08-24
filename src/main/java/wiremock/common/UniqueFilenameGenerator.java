@@ -19,25 +19,25 @@ import java.net.URI;
 
 public class UniqueFilenameGenerator {
 
-    public static String generate(String url, String prefix, String id) {
-        return generate(url, prefix, id, "json");
-    }
+  public static String generate(String url, String prefix, String id) {
+    return generate(url, prefix, id, "json");
+  }
 
-    public static String generate(String url, String prefix, String id, String extension) {
-        String pathPart = Urls.urlToPathParts(URI.create(url));
-        pathPart = pathPart.equals("") ? "(root)" : sanitise(pathPart);
+  public static String generate(String url, String prefix, String id, String extension) {
+    String pathPart = Urls.urlToPathParts(URI.create(url));
+    pathPart = pathPart.equals("") ? "(root)" : sanitise(pathPart);
 
-        return new StringBuilder(prefix)
-                .append("-")
-                .append(pathPart)
-                .append("-")
-                .append(id)
-                .append(".")
-                .append(extension)
-                .toString();
-    }
+    return new StringBuilder(prefix)
+        .append("-")
+        .append(pathPart)
+        .append("-")
+        .append(id)
+        .append(".")
+        .append(extension)
+        .toString();
+  }
 
-    private static String sanitise(String input) {
-        return input.replaceAll("[,~:/?#\\[\\]@!\\$&'()*+;=]", "_");
-    }
+  private static String sanitise(String input) {
+    return input.replaceAll("[,~:/?#\\[\\]@!\\$&'()*+;=]", "_");
+  }
 }

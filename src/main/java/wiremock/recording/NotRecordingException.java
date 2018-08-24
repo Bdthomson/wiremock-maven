@@ -20,7 +20,7 @@ import wiremock.common.Errors;
 
 public class NotRecordingException extends ClientError {
 
-    public NotRecordingException() {
-        super(Errors.notRecording());
-    }
+  public NotRecordingException() {
+    super(Errors.notRecording());
+  }
 }

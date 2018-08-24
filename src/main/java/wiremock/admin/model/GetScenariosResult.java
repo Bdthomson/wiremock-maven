@@ -17,19 +17,19 @@ package wiremock.admin.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import wiremock.stubbing.Scenario;
 import java.util.List;
+import wiremock.stubbing.Scenario;
 
 public class GetScenariosResult {
 
-    private final List<Scenario> scenarios;
+  private final List<Scenario> scenarios;
 
-    @JsonCreator
-    public GetScenariosResult(@JsonProperty("scenarios") List<Scenario> scenarios) {
-        this.scenarios = scenarios;
-    }
+  @JsonCreator
+  public GetScenariosResult(@JsonProperty("scenarios") List<Scenario> scenarios) {
+    this.scenarios = scenarios;
+  }
 
-    public List<Scenario> getScenarios() {
-        return scenarios;
-    }
+  public List<Scenario> getScenarios() {
+    return scenarios;
+  }
 }

@@ -15,21 +15,23 @@
  */
 package wiremock.verification;
 
-import wiremock.matching.RequestPattern;
-import wiremock.stubbing.ServeEvent;
 import com.google.common.base.Optional;
 import java.util.List;
 import java.util.UUID;
+import wiremock.matching.RequestPattern;
+import wiremock.stubbing.ServeEvent;
 
 public interface RequestJournal {
 
-	int countRequestsMatching(RequestPattern requestPattern);
-    List<LoggedRequest> getRequestsMatching(RequestPattern requestPattern);
+  int countRequestsMatching(RequestPattern requestPattern);
 
-    List<ServeEvent> getAllServeEvents();
-    Optional<ServeEvent> getServeEvent(UUID id);
+  List<LoggedRequest> getRequestsMatching(RequestPattern requestPattern);
 
-	void reset();
+  List<ServeEvent> getAllServeEvents();
 
-    void requestReceived(ServeEvent serveEvent);
+  Optional<ServeEvent> getServeEvent(UUID id);
+
+  void reset();
+
+  void requestReceived(ServeEvent serveEvent);
 }

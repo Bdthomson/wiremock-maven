@@ -17,8 +17,11 @@ package wiremock.core;
 
 public interface FaultInjector {
 
-    void connectionResetByPeer();
-    void emptyResponseAndCloseConnection();
-    void malformedResponseChunk();
-    void randomDataAndCloseConnection();
+  void connectionResetByPeer();
+
+  void emptyResponseAndCloseConnection();
+
+  void malformedResponseChunk();
+
+  void randomDataAndCloseConnection();
 }

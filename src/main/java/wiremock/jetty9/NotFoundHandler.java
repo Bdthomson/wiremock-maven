@@ -28,21 +28,26 @@ import org.eclipse.jetty.server.handler.ErrorHandler;
 
 public class NotFoundHandler extends ErrorHandler {
 
-    private final ErrorHandler DEFAULT_HANDLER = new ErrorHandler();
+  private final ErrorHandler DEFAULT_HANDLER = new ErrorHandler();
 
-    @Override
-    public void handle(String target, final Request baseRequest, final HttpServletRequest request, HttpServletResponse response) throws IOException {
-        if (response.getStatus() == 404) {
-            ServletContext adminContext = request.getServletContext().getContext("/__admin");
-            Dispatcher requestDispatcher = (Dispatcher) adminContext.getRequestDispatcher("/not-matched");
+  @Override
+  public void handle(
+      String target,
+      final Request baseRequest,
+      final HttpServletRequest request,
+      HttpServletResponse response)
+      throws IOException {
+    if (response.getStatus() == 404) {
+      ServletContext adminContext = request.getServletContext().getContext("/__admin");
+      Dispatcher requestDispatcher = (Dispatcher) adminContext.getRequestDispatcher("/not-matched");
 
-            try {
-                requestDispatcher.error(request, response);
-            } catch (ServletException e) {
-                throwUnchecked(e);
-            }
-        } else {
-            DEFAULT_HANDLER.handle(target, baseRequest, request, response);
-        }
+      try {
+        requestDispatcher.error(request, response);
+      } catch (ServletException e) {
+        throwUnchecked(e);
+      }
+    } else {
+      DEFAULT_HANDLER.handle(target, baseRequest, request, response);
     }
+  }
 }

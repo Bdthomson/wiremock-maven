@@ -17,44 +17,44 @@ package wiremock.servlet;
 
 import static wiremock.common.Exceptions.throwUnchecked;
 
-import wiremock.core.FaultInjector;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
+import wiremock.core.FaultInjector;
 
 public class NoFaultInjector implements FaultInjector {
 
-    private final HttpServletResponse httpServletResponse;
+  private final HttpServletResponse httpServletResponse;
 
-    public NoFaultInjector(HttpServletResponse httpServletResponse) {
-        this.httpServletResponse = httpServletResponse;
-    }
+  public NoFaultInjector(HttpServletResponse httpServletResponse) {
+    this.httpServletResponse = httpServletResponse;
+  }
 
-    @Override
-    public void connectionResetByPeer() {
-        sendError();
-    }
+  @Override
+  public void connectionResetByPeer() {
+    sendError();
+  }
 
-    @Override
-    public void emptyResponseAndCloseConnection() {
-        sendError();
-    }
+  @Override
+  public void emptyResponseAndCloseConnection() {
+    sendError();
+  }
 
-    @Override
-    public void malformedResponseChunk() {
-        sendError();
-    }
+  @Override
+  public void malformedResponseChunk() {
+    sendError();
+  }
 
-    @Override
-    public void randomDataAndCloseConnection() {
-        sendError();
-    }
+  @Override
+  public void randomDataAndCloseConnection() {
+    sendError();
+  }
 
-    private void sendError() {
-        httpServletResponse.setStatus(418);
-        try {
-            httpServletResponse.getWriter().write("No fault injector is configured!");
-        } catch (IOException e) {
-            throwUnchecked(e);
-        }
+  private void sendError() {
+    httpServletResponse.setStatus(418);
+    try {
+      httpServletResponse.getWriter().write("No fault injector is configured!");
+    } catch (IOException e) {
+      throwUnchecked(e);
     }
+  }
 }

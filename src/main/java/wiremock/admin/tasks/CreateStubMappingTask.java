@@ -27,10 +27,10 @@ import wiremock.stubbing.StubMapping;
 
 public class CreateStubMappingTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        StubMapping newMapping = StubMapping.buildFrom(request.getBodyAsString());
-        admin.addStubMapping(newMapping);
-        return ResponseDefinitionBuilder.jsonResponse(newMapping, HTTP_CREATED);
-    }
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    StubMapping newMapping = StubMapping.buildFrom(request.getBodyAsString());
+    admin.addStubMapping(newMapping);
+    return ResponseDefinitionBuilder.jsonResponse(newMapping, HTTP_CREATED);
+  }
 }

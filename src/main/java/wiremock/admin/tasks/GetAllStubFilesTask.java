@@ -17,6 +17,9 @@ package wiremock.admin.tasks;
 
 import static wiremock.core.WireMockApp.FILES_ROOT;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import wiremock.admin.AdminTask;
 import wiremock.admin.model.PathParams;
 import wiremock.common.FileSource;
@@ -24,19 +27,16 @@ import wiremock.common.TextFile;
 import wiremock.core.Admin;
 import wiremock.http.Request;
 import wiremock.http.ResponseDefinition;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class GetAllStubFilesTask implements AdminTask {
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        FileSource fileSource = admin.getOptions().filesRoot().child(FILES_ROOT);
-        List<String> filePaths = new ArrayList<>();
-        for (TextFile textFile : fileSource.listFilesRecursively()) {
-            filePaths.add(textFile.getPath());
-        }
-        Collections.sort(filePaths);
-        return ResponseDefinition.okForJson(filePaths);
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    FileSource fileSource = admin.getOptions().filesRoot().child(FILES_ROOT);
+    List<String> filePaths = new ArrayList<>();
+    for (TextFile textFile : fileSource.listFilesRecursively()) {
+      filePaths.add(textFile.getPath());
     }
+    Collections.sort(filePaths);
+    return ResponseDefinition.okForJson(filePaths);
+  }
 }

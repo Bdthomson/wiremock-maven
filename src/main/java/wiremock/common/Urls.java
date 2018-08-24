@@ -15,10 +15,9 @@
  */
 package wiremock.common;
 
-import static wiremock.common.Exceptions.throwUnchecked;
 import static com.google.common.collect.FluentIterable.from;
+import static wiremock.common.Exceptions.throwUnchecked;
 
-import wiremock.http.QueryParameter;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
@@ -33,67 +32,67 @@ import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
+import wiremock.http.QueryParameter;
 
 public class Urls {
 
-    public static Map<String, QueryParameter> splitQuery(String query) {
-        if (query == null) {
-            return Collections.emptyMap();
-        }
+  public static Map<String, QueryParameter> splitQuery(String query) {
+    if (query == null) {
+      return Collections.emptyMap();
+    }
 
-        Iterable<String> pairs = Splitter.on('&').split(query);
-        ImmutableListMultimap.Builder<String, String> builder = ImmutableListMultimap.builder();
-        for (String queryElement: pairs) {
-            int firstEqualsIndex = queryElement.indexOf('=');
-            if (firstEqualsIndex == -1) {
-                builder.putAll(queryElement, "");
-            } else {
-                String key = queryElement.substring(0, firstEqualsIndex);
-                String value = decode(queryElement.substring(firstEqualsIndex + 1));
-                builder.putAll(key, value);
-            }
-        }
+    Iterable<String> pairs = Splitter.on('&').split(query);
+    ImmutableListMultimap.Builder<String, String> builder = ImmutableListMultimap.builder();
+    for (String queryElement : pairs) {
+      int firstEqualsIndex = queryElement.indexOf('=');
+      if (firstEqualsIndex == -1) {
+        builder.putAll(queryElement, "");
+      } else {
+        String key = queryElement.substring(0, firstEqualsIndex);
+        String value = decode(queryElement.substring(firstEqualsIndex + 1));
+        builder.putAll(key, value);
+      }
+    }
 
-        return Maps.transformEntries(builder.build().asMap(), new Maps.EntryTransformer<String, Collection<String>, QueryParameter>() {
-            public QueryParameter transformEntry(String key, Collection<String> values) {
-                return new QueryParameter(key, ImmutableList.copyOf(values));
-            }
+    return Maps.transformEntries(
+        builder.build().asMap(),
+        new Maps.EntryTransformer<String, Collection<String>, QueryParameter>() {
+          public QueryParameter transformEntry(String key, Collection<String> values) {
+            return new QueryParameter(key, ImmutableList.copyOf(values));
+          }
         });
+  }
+
+  public static String urlToPathParts(URI uri) {
+    Iterable<String> uriPathNodes = Splitter.on("/").omitEmptyStrings().split(uri.getPath());
+    int nodeCount = Iterables.size(uriPathNodes);
+
+    return nodeCount > 0
+        ? Joiner.on("-").join(from(uriPathNodes).skip(nodeCount - Math.min(nodeCount, 2)))
+        : "";
+  }
+
+  public static Map<String, QueryParameter> splitQuery(URI uri) {
+    if (uri == null) {
+      return Collections.emptyMap();
     }
 
-    public static String urlToPathParts(URI uri) {
-        Iterable<String> uriPathNodes = Splitter.on("/").omitEmptyStrings().split(uri.getPath());
-        int nodeCount = Iterables.size(uriPathNodes);
+    return splitQuery(uri.getRawQuery());
+  }
 
-        return nodeCount > 0 ?
-            Joiner.on("-")
-            .join(from(uriPathNodes)
-                .skip(nodeCount - Math.min(nodeCount, 2))
-            ):
-            "";
+  public static String decode(String encoded) {
+    try {
+      return URLDecoder.decode(encoded, "utf-8");
+    } catch (UnsupportedEncodingException e) {
+      return throwUnchecked(e, String.class);
     }
+  }
 
-    public static Map<String, QueryParameter> splitQuery(URI uri) {
-        if (uri == null) {
-            return Collections.emptyMap();
-        }
-
-        return splitQuery(uri.getRawQuery());
+  public static URL safelyCreateURL(String url) {
+    try {
+      return new URL(url);
+    } catch (MalformedURLException e) {
+      return throwUnchecked(e, URL.class);
     }
-
-    public static String decode(String encoded) {
-        try {
-            return URLDecoder.decode(encoded, "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            return throwUnchecked(e, String.class);
-        }
-    }
-
-    public static URL safelyCreateURL(String url) {
-        try {
-            return new URL(url);
-        } catch (MalformedURLException e) {
-            return throwUnchecked(e, URL.class);
-        }
-    }
+  }
 }

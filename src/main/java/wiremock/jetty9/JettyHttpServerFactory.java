@@ -22,16 +22,11 @@ import wiremock.http.HttpServerFactory;
 import wiremock.http.StubRequestHandler;
 
 public class JettyHttpServerFactory implements HttpServerFactory {
-    @Override
-    public HttpServer buildHttpServer(
-            Options options,
-            AdminRequestHandler adminRequestHandler,
-            StubRequestHandler stubRequestHandler
-    ) {
-        return new JettyHttpServer(
-                options,
-                adminRequestHandler,
-                stubRequestHandler
-        );
-    }
+  @Override
+  public HttpServer buildHttpServer(
+      Options options,
+      AdminRequestHandler adminRequestHandler,
+      StubRequestHandler stubRequestHandler) {
+    return new JettyHttpServer(options, adminRequestHandler, stubRequestHandler);
+  }
 }

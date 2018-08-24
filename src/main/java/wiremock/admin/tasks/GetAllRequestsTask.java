@@ -15,8 +15,8 @@
  */
 package wiremock.admin.tasks;
 
-import static wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 
 import wiremock.admin.AdminTask;
 import wiremock.admin.LimitAndSinceDatePaginator;
@@ -29,21 +29,18 @@ import wiremock.http.ResponseDefinition;
 
 public class GetAllRequestsTask implements AdminTask {
 
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        GetServeEventsResult serveEventsResult = admin.getServeEvents();
-        GetServeEventsResult result = new GetServeEventsResult(
-            LimitAndSinceDatePaginator.fromRequest(
-                serveEventsResult.getRequests(),
-                request
-            ),
-            serveEventsResult.isRequestJournalDisabled()
-        );
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    GetServeEventsResult serveEventsResult = admin.getServeEvents();
+    GetServeEventsResult result =
+        new GetServeEventsResult(
+            LimitAndSinceDatePaginator.fromRequest(serveEventsResult.getRequests(), request),
+            serveEventsResult.isRequestJournalDisabled());
 
-        return responseDefinition()
-            .withStatus(HTTP_OK)
-            .withBody(Json.write(result))
-            .withHeader("Content-Type", "application/json")
-            .build();
-    }
+    return responseDefinition()
+        .withStatus(HTTP_OK)
+        .withBody(Json.write(result))
+        .withHeader("Content-Type", "application/json")
+        .build();
+  }
 }

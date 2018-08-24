@@ -15,32 +15,32 @@
  */
 package wiremock.extension;
 
-import wiremock.common.Json;
-import wiremock.common.Metadata;
 import com.google.common.collect.ImmutableMap;
 import java.util.Map;
+import wiremock.common.Json;
+import wiremock.common.Metadata;
 
 public class Parameters extends Metadata {
 
-    public static Parameters empty() {
-        return new Parameters();
-    }
+  public static Parameters empty() {
+    return new Parameters();
+  }
 
-    public static Parameters from(Map<String, Object> parameterMap) {
-        Parameters parameters = new Parameters();
-        parameters.putAll(parameterMap);
-        return parameters;
-    }
+  public static Parameters from(Map<String, Object> parameterMap) {
+    Parameters parameters = new Parameters();
+    parameters.putAll(parameterMap);
+    return parameters;
+  }
 
-    public static Parameters one(String name, Object value) {
-        return from(ImmutableMap.of(name, value));
-    }
+  public static Parameters one(String name, Object value) {
+    return from(ImmutableMap.of(name, value));
+  }
 
-    public static <T> Parameters of(T myData) {
-        return from(Json.objectToMap(myData));
-    }
+  public static <T> Parameters of(T myData) {
+    return from(Json.objectToMap(myData));
+  }
 
-    public <T> T as(Class<T> myDataClass) {
-        return Json.mapToObject(this, myDataClass);
-    }
+  public <T> T as(Class<T> myDataClass) {
+    return Json.mapToObject(this, myDataClass);
+  }
 }

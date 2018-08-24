@@ -24,62 +24,60 @@ import java.util.Collections;
 
 public class HttpHeader extends MultiValue {
 
-    public HttpHeader(String key, String... values) {
-        super(key, asList(values));
-    }
+  public HttpHeader(String key, String... values) {
+    super(key, asList(values));
+  }
 
-    public HttpHeader(CaseInsensitiveKey key, Collection<String> values) {
-        super(key.value(), ImmutableList.copyOf(values));
-    }
+  public HttpHeader(CaseInsensitiveKey key, Collection<String> values) {
+    super(key.value(), ImmutableList.copyOf(values));
+  }
 
-    public HttpHeader(String key, Collection<String> values) {
-        super(
-            key,
-            ImmutableList.copyOf(firstNonNull(values, Collections.<String>emptyList()))
-        );
-    }
+  public HttpHeader(String key, Collection<String> values) {
+    super(key, ImmutableList.copyOf(firstNonNull(values, Collections.<String>emptyList())));
+  }
 
-    public static HttpHeader httpHeader(CaseInsensitiveKey key, String... values) {
-        return new HttpHeader(key.value(), values);
-    }
+  public static HttpHeader httpHeader(CaseInsensitiveKey key, String... values) {
+    return new HttpHeader(key.value(), values);
+  }
 
-    public static HttpHeader httpHeader(String key, String... values) {
-        return new HttpHeader(key, values);
-    }
+  public static HttpHeader httpHeader(String key, String... values) {
+    return new HttpHeader(key, values);
+  }
 
-    public static HttpHeader absent(String key) {
-        return new HttpHeader(key);
-    }
+  public static HttpHeader absent(String key) {
+    return new HttpHeader(key);
+  }
 
-    public static HttpHeader empty(String key) {
-        return httpHeader(key, "");
-    }
+  public static HttpHeader empty(String key) {
+    return httpHeader(key, "");
+  }
 
-    public CaseInsensitiveKey caseInsensitiveKey() {
-        return CaseInsensitiveKey.from(key);
-    }
+  public CaseInsensitiveKey caseInsensitiveKey() {
+    return CaseInsensitiveKey.from(key);
+  }
 
-    public boolean keyEquals(String candidateKey) {
-        return CaseInsensitiveKey.from(candidateKey).equals(caseInsensitiveKey());
-    }
+  public boolean keyEquals(String candidateKey) {
+    return CaseInsensitiveKey.from(candidateKey).equals(caseInsensitiveKey());
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
 
-        HttpHeader that = (HttpHeader) o;
+    HttpHeader that = (HttpHeader) o;
 
-        if (key != null ? !key.toLowerCase().equals(that.key.toLowerCase()) : that.key != null) return false;
-        if (values != null ? !values.equals(that.values) : that.values != null) return false;
+    if (key != null ? !key.toLowerCase().equals(that.key.toLowerCase()) : that.key != null)
+      return false;
+    if (values != null ? !values.equals(that.values) : that.values != null) return false;
 
-        return true;
-    }
+    return true;
+  }
 
-    @Override
-    public int hashCode() {
-        int result = key != null ? key.toLowerCase().hashCode() : 0;
-        result = 31 * result + (values != null ? values.hashCode() : 0);
-        return result;
-    }
+  @Override
+  public int hashCode() {
+    int result = key != null ? key.toLowerCase().hashCode() : 0;
+    result = 31 * result + (values != null ? values.hashCode() : 0);
+    return result;
+  }
 }

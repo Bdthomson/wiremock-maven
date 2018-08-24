@@ -15,27 +15,27 @@
  */
 package wiremock.admin.tasks;
 
-import static wiremock.core.WireMockApp.FILES_ROOT;
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
+import static wiremock.core.WireMockApp.FILES_ROOT;
 
+import java.io.File;
 import wiremock.admin.AdminTask;
 import wiremock.admin.model.PathParams;
 import wiremock.common.FileSource;
 import wiremock.core.Admin;
 import wiremock.http.Request;
 import wiremock.http.ResponseDefinition;
-import java.io.File;
 
 public class DeleteStubFileTask implements AdminTask {
-    @Override
-    public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
-        FileSource fileSource = admin.getOptions().filesRoot().child(FILES_ROOT);
-        File filename = new File(fileSource.getPath(), pathParams.get("filename"));
-        boolean deleted = filename.delete();
-        if (deleted) {
-            return ResponseDefinition.ok();
-        } else {
-            return new ResponseDefinition(HTTP_INTERNAL_ERROR, "File not deleted");
-        }
+  @Override
+  public ResponseDefinition execute(Admin admin, Request request, PathParams pathParams) {
+    FileSource fileSource = admin.getOptions().filesRoot().child(FILES_ROOT);
+    File filename = new File(fileSource.getPath(), pathParams.get("filename"));
+    boolean deleted = filename.delete();
+    if (deleted) {
+      return ResponseDefinition.ok();
+    } else {
+      return new ResponseDefinition(HTTP_INTERNAL_ERROR, "File not deleted");
     }
+  }
 }

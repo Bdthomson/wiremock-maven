@@ -17,5 +17,4 @@ package wiremock.standalone;
 
 import wiremock.core.MappingsSaver;
 
-public interface MappingsSource extends MappingsLoader, MappingsSaver {
-}
+public interface MappingsSource extends MappingsLoader, MappingsSaver {}
