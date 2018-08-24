@@ -15,11 +15,11 @@
  */
 package wiremock.standalone;
 
-import static com.github.tomakehurst.wiremock.core.WireMockApp.FILES_ROOT;
-import static com.github.tomakehurst.wiremock.core.WireMockApp.MAPPINGS_ROOT;
 import static java.lang.System.out;
 import static wiremock.client.ResponseDefinitionBuilder.responseDefinition;
 import static wiremock.client.WireMock.anyUrl;
+import static wiremock.core.WireMockApp.FILES_ROOT;
+import static wiremock.core.WireMockApp.MAPPINGS_ROOT;
 import static wiremock.http.RequestMethod.ANY;
 import static wiremock.matching.RequestPatternBuilder.newRequestPattern;
 
